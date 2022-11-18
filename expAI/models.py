@@ -1,0 +1,170 @@
+# This is an auto-generated Django model module.
+# You'll have to do the following manually to clean this up:
+#   * Rearrange models' order
+#   * Make sure each model has one field with primary_key=True
+#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
+#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
+# Feel free to rename the models, but don't rename db_table values or field names.
+from django.db import models
+
+
+class Accounts(models.Model):
+    accountid = models.OneToOneField('Users', models.DO_NOTHING, db_column='accountID', primary_key=True)  # Field name made lowercase.
+    accusername = models.CharField(db_column='accUsername', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    accpassword = models.CharField(db_column='accPassword', max_length=256, blank=True, null=True)  # Field name made lowercase.
+    acccreatedtime = models.DateTimeField(db_column='accCreatedTime', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'accounts'
+
+
+class Datasets(models.Model):
+    datasetid = models.CharField(db_column='datasetID', primary_key=True, max_length=20)  # Field name made lowercase.
+    datasetname = models.CharField(db_column='datasetName', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    datasettype = models.CharField(db_column='datasetType', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    datasetfolderurl = models.CharField(db_column='datasetFolderURL', max_length=200, blank=True, null=True)  # Field name made lowercase.
+    datasettraining = models.IntegerField(db_column='datasetTraining', blank=True, null=True)  # Field name made lowercase.
+    datasettesting = models.IntegerField(db_column='datasetTesting', blank=True, null=True)  # Field name made lowercase.
+    datasetsum = models.IntegerField(db_column='datasetSum', blank=True, null=True)  # Field name made lowercase.
+    datasetcreator = models.CharField(db_column='datasetCreator', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    datasetcreatedtime = models.DateTimeField(db_column='datasetCreatedTime', blank=True, null=True)  # Field name made lowercase.
+    datasetdescription = models.CharField(db_column='datasetDescription', max_length=200, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    datasetidentities = models.IntegerField(db_column='datasetIdentities', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'datasets'
+
+
+class Evaluations(models.Model):
+    evaluateid = models.CharField(db_column='evaluateID', primary_key=True, max_length=20)  # Field name made lowercase.
+    evaluateconfusionmatrixtraining = models.CharField(db_column='evaluateConfusionMatrixTraining', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    evaluateconfusionmatrixtesting = models.CharField(db_column='evaluateConfusionMatrixTesting', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    evaluateconfutionmatrixvalidation = models.CharField(db_column='evaluateConfutionMatrixValidation', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    evaluatenumclass = models.IntegerField(db_column='evaluateNumClass', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'evaluations'
+
+
+class Experiments(models.Model):
+    expid = models.CharField(db_column='expID', primary_key=True, max_length=20)  # Field name made lowercase.
+    expname = models.CharField(db_column='expName', max_length=100, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    exptype = models.CharField(db_column='expType', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    expcreatorid = models.ForeignKey('Users', models.DO_NOTHING, db_column='expCreatorID', blank=True, null=True)  # Field name made lowercase.
+    expcreatedtime = models.DateTimeField(db_column='expCreatedTime', blank=True, null=True)  # Field name made lowercase.
+    expmodelid = models.ForeignKey('Models', models.DO_NOTHING, db_column='expModelID', blank=True, null=True)  # Field name made lowercase.
+    expdatasetid = models.ForeignKey(Datasets, models.DO_NOTHING, db_column='expDatasetID', blank=True, null=True)  # Field name made lowercase.
+    expfilelog = models.CharField(db_column='expFileLog', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    expsoftwarelibid = models.ForeignKey('Softwarelibs', models.DO_NOTHING, db_column='expSoftwareLibID', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'experiments'
+
+
+class Models(models.Model):
+    modelid = models.CharField(db_column='modelID', primary_key=True, max_length=20)  # Field name made lowercase.
+    modelname = models.CharField(db_column='modelName', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    modeltype = models.CharField(db_column='modelType', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    modelfiletutorial = models.CharField(db_column='modelFIleTutorial', max_length=200, blank=True, null=True)  # Field name made lowercase.
+    modelfiledescription = models.CharField(db_column='modelFileDescription', max_length=200, blank=True, null=True)  # Field name made lowercase.
+    modeldescription = models.CharField(db_column='modelDescription', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    modeleventtype = models.CharField(db_column='modelEventType', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    modelcreator = models.CharField(db_column='modelCreator', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    modelcreatedtime = models.DateTimeField(db_column='modelCreatedTime', blank=True, null=True)  # Field name made lowercase.
+    modelsoftlibid = models.CharField(db_column='modelSoftLibID', max_length=45, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'models'
+
+
+class Objectembeddings(models.Model):
+    objid = models.OneToOneField('Objects', models.DO_NOTHING, db_column='objID', primary_key=True)  # Field name made lowercase.
+    expid = models.ForeignKey(Experiments, models.DO_NOTHING, db_column='expID')  # Field name made lowercase.
+    note = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'objectembeddings'
+        unique_together = (('objid', 'expid'),)
+
+
+class Objects(models.Model):
+    objid = models.CharField(db_column='objID', primary_key=True, max_length=20)  # Field name made lowercase.
+    objname = models.CharField(db_column='objName', max_length=50, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    objgeneralinfo = models.CharField(db_column='objGeneralInfo', max_length=500, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    objurlfolder = models.CharField(db_column='objURLFolder', max_length=200, blank=True, null=True)  # Field name made lowercase.
+    objcreatedtime = models.DateTimeField(db_column='objCreatedTime', blank=True, null=True)  # Field name made lowercase.
+    objcreator = models.CharField(db_column='objCreator', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    objembfile = models.CharField(db_column='objEmbFile', max_length=200, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'objects'
+
+
+class Paramsconfigs(models.Model):
+    configid = models.IntegerField(db_column='configID', primary_key=True)  # Field name made lowercase.
+    configimagesize = models.CharField(db_column='configImageSize', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    configlearningrate = models.FloatField(db_column='configLearningRate', blank=True, null=True)  # Field name made lowercase.
+    configalgorithm = models.CharField(db_column='configAlgorithm', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    configepoch = models.IntegerField(db_column='configEpoch', blank=True, null=True)  # Field name made lowercase.
+    configbatchsize = models.IntegerField(db_column='configBatchSize', blank=True, null=True)  # Field name made lowercase.
+    configexpid = models.ForeignKey(Experiments, models.DO_NOTHING, db_column='configExpID', blank=True, null=True)  # Field name made lowercase.
+    configresid = models.CharField(db_column='configResID', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    configevaluateid = models.ForeignKey(Evaluations, models.DO_NOTHING, db_column='configEvaluateID', blank=True, null=True)  # Field name made lowercase.
+    trainedmodel = models.CharField(db_column='trainedModel', max_length=200, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'paramsconfigs'
+
+
+class Results(models.Model):
+    resultid = models.CharField(db_column='resultID', primary_key=True, max_length=20)  # Field name made lowercase.
+    resulttestingdataset = models.CharField(db_column='resultTestingDataset', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    resultaccuracy = models.FloatField(db_column='resultAccuracy', blank=True, null=True)  # Field name made lowercase.
+    resultdetail = models.CharField(db_column='resultDetail', max_length=1000, blank=True, null=True)  # Field name made lowercase.
+    resultconfigid = models.ForeignKey(Paramsconfigs, models.DO_NOTHING, db_column='resultConfigID', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'results'
+
+
+class Roles(models.Model):
+    roleid = models.IntegerField(db_column='roleID', primary_key=True)  # Field name made lowercase.
+    rolename = models.CharField(db_column='roleName', unique=True, max_length=45, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'roles'
+
+
+class Softwarelibs(models.Model):
+    softwarelibid = models.CharField(db_column='softwarelibID', primary_key=True, max_length=20)  # Field name made lowercase.
+    softwarelibname = models.CharField(db_column='softwarelibName', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    softwareliburl = models.CharField(db_column='softwarelibURL', max_length=200, blank=True, null=True)  # Field name made lowercase.
+    softwarelibdescription = models.CharField(db_column='softwarelibDescription', max_length=1000, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'softwarelibs'
+
+
+class Users(models.Model):
+    usrid = models.CharField(db_column='usrID', primary_key=True, max_length=20)  # Field name made lowercase.
+    usrfullname = models.CharField(db_column='usrFullName', max_length=50, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    usrdob = models.DateField(db_column='usrDoB', blank=True, null=True)  # Field name made lowercase.
+    usrclass = models.CharField(db_column='usrClass', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    usrfaculty = models.CharField(db_column='usrFaculty', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    usrrole = models.ForeignKey(Roles, models.DO_NOTHING, db_column='usrRole', blank=True, null=True)  # Field name made lowercase.
+    usraccid = models.CharField(db_column='usrAccID', max_length=20, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'users'
