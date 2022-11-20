@@ -27,9 +27,15 @@ router = DefaultRouter()
 # router.register(r'monhoc', views.MonthiViewSet)
 # router.register(r'diemthi', views.DiemthiViewSet)
 router.register(r'expAIs', views.expAIViewSet,basename="expAIs")
+router.register(r'accounts', views.AccountsViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+        re_path(r'^register/$', views.RegisterView.as_view(), name='user-register'),
+    re_path(r'^login/$', views.LoginView.as_view(), name='user-login'),
+    re_path(r'^logout/$', views.LogoutView.as_view(), name='user-logout'),
+    re_path(r'^current/$', views.UserView.as_view(), name='user-current'),
+    re_path(r'^change-password/$', views.ChangePasswordView.as_view(), name='change-password'),
 ]
