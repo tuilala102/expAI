@@ -74,3 +74,8 @@ class SoftwareLibsSerializer(ModelSerializer):
         fields = ["softwarelibid","softwarelibname","softwareliburl","softwarelibdescription"]
 
 
+class ExperimentsSerializer(ModelSerializer):
+    class Meta:
+        model = Experiments
+        fields = ["expid","expname","exptype","expcreatorid","expcreatedtime",
+        "expmodelid","expdatasetid","expfilelog","expsoftwarelibid","expaftertrainmodelpath"]

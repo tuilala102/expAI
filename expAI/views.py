@@ -152,3 +152,19 @@ class UserView(generics.RetrieveAPIView):
     #     print(self.queryset)
     #     objs = expAI.objects.filter(name__exact=name)
     #     return Response(StudientSerializer(objs).data)
+
+class ExperimentsViewSet(viewsets.ModelViewSet):
+    queryset = Experiments.objects.all()
+    serializer_class = ExperimentsSerializer
+
+    param1 = openapi.Parameter('id_model',openapi.IN_QUERY,description='id cua model',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[param1],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-models-name')
+    def get_model_name(self, request):
+        """
+        get model name API
+        """
+        id_model = request.query_params.get('id_model')
+
+        obj = Models.objects.get(modelid = id_model)
+        return Response({"result": obj.modelname})

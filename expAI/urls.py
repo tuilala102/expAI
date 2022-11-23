@@ -28,6 +28,7 @@ router = DefaultRouter()
 # router.register(r'diemthi', views.DiemthiViewSet)
 router.register(r'expAIs', views.expAIViewSet,basename="expAIs")
 router.register(r'accounts', views.AccountsViewSet)
+router.register(r'experiment',views.ExperimentsViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
