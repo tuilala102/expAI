@@ -31,7 +31,18 @@ class AccountsViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
+    @swagger_auto_schema(method='post',responses={404: 'Not found', 200:'ok', 201:UserSerializer})
+    @action(methods=['POST'], detail=False, url_path='change-password-for-admin')
+    def change_password(self, request):
+        """
+        Change User's Password API
+        """
+        id_user = request.data.get('id_user')
+        new_password = request.data.get('new_password')
+        obj = User.objects.get(id = id_user)
+        obj.set_password(new_password)
+        obj.save()
+        return Response({"result": "Success"})
 
 class CsrfExemptSessionAuthentication(authentication.SessionAuthentication):
     def enforce_csrf(self, request):

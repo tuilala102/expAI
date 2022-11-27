@@ -3,7 +3,7 @@ from .models import *
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from .validators import validate_username
-
+from .permissions import *
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

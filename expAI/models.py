@@ -34,7 +34,8 @@ class UserManager(BaseUserManager):
         return self.get(**{'{}__iexact'.format(self.model.USERNAME_FIELD): username})
 
     def create_user(self, email, password, **extra_fields):
-        return self._create_user(email, password, is_superuser= False, **extra_fields)
+        role = Roles.objects.get(rolename="STUDENT")
+        return self._create_user(email, password, is_superuser= False, roleid = role, **extra_fields)
     
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, True, True, **extra_fields)
@@ -46,7 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField('Is staff', default=False)
     is_active = models.BooleanField('Is active', default=True)
     joined_at = models.DateTimeField('Joined at', default=timezone.now)
-
+    roleid = models.ForeignKey('roles', models.DO_NOTHING, db_column='roleid', blank=True, null=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -207,7 +208,7 @@ class Users(models.Model):
     usrdob = models.DateField(db_column='usrDoB', blank=True, null=True)  # Field name made lowercase.
     usrclass = models.CharField(db_column='usrClass', max_length=45, blank=True, null=True)  # Field name made lowercase.
     usrfaculty = models.CharField(db_column='usrFaculty', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    # usraccid = models.OneToOneField('User', db_column='id', max_length=20, blank=True, null=True, on_delete=models.DO_NOTHING)  # Field name made lowercase.
+    usraccid = models.OneToOneField('User', db_column='id', max_length=20, blank=True, null=True, on_delete=models.DO_NOTHING)  # Field name made lowercase.
 
     class Meta:
         managed = True
