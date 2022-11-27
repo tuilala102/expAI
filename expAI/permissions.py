@@ -1,14 +1,16 @@
 from rest_framework.permissions import BasePermission
-
+from .models import *
 class IsOwner(BasePermission):
     """
        Allows access only to owners
     """
 
-    def has_permission(self, request, view):
-       pk = request.GET.get('pk')
-       user_meta = UsersMeta.objects.filter(user=request.user, token=pk).first()
-       return True if user_meta and user_meta.type == "owner" else False
+    def has_permission(self, request, view, obj):
+       
+        if request.user in obj.authors :
+            return True
+
+        return False
 
 
 class IsAdmin(BasePermission):
@@ -16,17 +18,17 @@ class IsAdmin(BasePermission):
     edit_methods = ("PUT", "PATCH")
 
     def has_permission(self, request, view):
-        usr = User.objects.get(username=request.user.username)
+        usr = User.objects.get(email=request.user.email)
         print(usr)
-        name_group = usr.roleid.name
+        name_group = usr.roleid.rolename
         if name_group == "ADMIN":
             return True
         return False
 
     def has_object_permission(self, request, view, obj):
-        usr = User.objects.get(username=request.user.username)
+        usr = User.objects.get(email=request.user.email)
         print(usr)
-        name_group = usr.roleid.name
+        name_group = usr.roleid.rolename
         if name_group == "ADMIN":
             return True
         return False
@@ -36,17 +38,17 @@ class IsTeacher(BasePermission):
     edit_methods = ("PUT", "PATCH")
 
     def has_permission(self, request, view):
-        usr = User.objects.get(username=request.user.username)
+        usr = User.objects.get(email=request.user.email)
         print(usr)
-        name_group = usr.roleid.name
+        name_group = usr.roleid.rolename
         if name_group == "TEACHER":
             return True
         return False
 
     def has_object_permission(self, request, view, obj):
-        usr = User.objects.get(username=request.user.username)
+        usr = User.objects.get(email=request.user.email)
         print(usr)
-        name_group = usr.roleid.name
+        name_group = usr.roleid.rolename
         if name_group == "TEACHER":
             return True
         return False
@@ -56,17 +58,17 @@ class IsStudent(BasePermission):
     edit_methods = ("PUT", "PATCH")
 
     def has_permission(self, request, view):
-        usr = User.objects.get(username=request.user.username)
+        usr = User.objects.get(email=request.user.email)
         print(usr)
-        name_group = usr.roleid.name
+        name_group = usr.roleid.rolename
         if name_group == "STUDENT":
             return True
         return False
 
     def has_object_permission(self, request, view, obj):
-        usr = User.objects.get(username=request.user.username)
+        usr = User.objects.get(email=request.user.email)
         print(usr)
-        name_group = usr.roleid.name
+        name_group = usr.roleid.rolename
         if name_group == "STUDENT":
             return True
         return False

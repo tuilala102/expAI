@@ -23,9 +23,7 @@ schema_view = get_schema_view(
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 
-# router.register(r'sinhvien', views.expAIViewSet)
-# router.register(r'monhoc', views.MonthiViewSet)
-# router.register(r'diemthi', views.DiemthiViewSet)
+
 router.register(r'expAIs', views.expAIViewSet,basename="expAIs")
 router.register(r'accounts', views.AccountsViewSet)
 router.register(r'experiment',views.ExperimentsViewSet)
@@ -39,4 +37,7 @@ urlpatterns = [
     re_path(r'^logout/$', views.LogoutView.as_view(), name='user-logout'),
     re_path(r'^current/$', views.UserView.as_view(), name='user-current'),
     re_path(r'^change-password/$', views.ChangePasswordView.as_view(), name='change-password'),
+    re_path(r'^change-password-2/$', views.ChangeUserPasswordView.as_view(), name='change-password-2'),
+    re_path(r'^change-name-2/$', views.ChangeNameView.as_view(), name='change-name-2'),
+    re_path(r'^delete-user-2/$', views.DeleteUserView.as_view(), name='delete-user'),
 ]

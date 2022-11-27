@@ -29,6 +29,30 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+class ChangeNameSerializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    password = serializers.CharField(required=True)
+    name = serializers.CharField(required=True)
+class DestroyUserSerializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    password = serializers.CharField(required=True)
+    
+class ChangePassword2Serializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    id_user = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
 
 
 

@@ -9,6 +9,7 @@ from drf_yasg import openapi
 from django.contrib.auth import login, logout
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated   
+from .permissions import *
 # Create your views here.
 
 
@@ -29,17 +30,22 @@ class AccountsViewSet(viewsets.ModelViewSet):
 
     Additionally we also provide an extra `checkBody` action.
     """
+    permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    @swagger_auto_schema(method='post',responses={404: 'Not found', 200:'ok', 201:UserSerializer})
-    @action(methods=['POST'], detail=False, url_path='change-password-for-admin')
-    def change_password(self, request):
+class ChangeUserPasswordView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = ChangePassword2Serializer
+    def get_object(self, queryset=None):
+            id_user = self.request.data.get('id_user')
+            obj = self.queryset.get(id=id_user)
+            return obj
+    def update(self, request):
         """
         Change User's Password API
         """
-        id_user = request.data.get('id_user')
+        obj = self.get_object()
         new_password = request.data.get('new_password')
-        obj = User.objects.get(id = id_user)
         obj.set_password(new_password)
         obj.save()
         return Response({"result": "Success"})
@@ -112,6 +118,74 @@ class ChangePasswordView(generics.UpdateAPIView):
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class DeleteUserView(generics.UpdateAPIView):
+        """
+        An endpoint for changing name.
+        """
+        serializer_class = DestroyUserSerializer
+        model = User
+        permission_classes = (IsAuthenticated,)
+
+        def get_object(self, queryset=None):
+            obj = self.request.user
+            obj = User.objects.get( id = obj.pk)
+            return obj
+
+        def update(self, request, *args, **kwargs):
+            self.object = self.get_object()
+            serializer = self.get_serializer(data=request.data)
+
+            if serializer.is_valid():
+                # Check password
+                if not self.object.check_password(serializer.data.get("password")):
+                    return Response({"password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+                # set_password also hashes the password that the user will get
+                
+                self.object.delete()
+                response = {
+                    'status': 'success',
+                    'code': status.HTTP_200_OK,
+                    'message': 'User destroy successfully',
+                    'data': []
+                }
+
+                return Response(response)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ChangeNameView(generics.UpdateAPIView):
+        """
+        An endpoint for changing name.
+        """
+        serializer_class = ChangeNameSerializer
+        model = User
+        permission_classes = (IsAuthenticated,)
+
+        def get_object(self, queryset=None):
+            obj = self.request.user
+            obj = User.objects.get( id = obj.pk)
+            return obj
+
+        def update(self, request, *args, **kwargs):
+            self.object = self.get_object()
+            serializer = self.get_serializer(data=request.data)
+
+            if serializer.is_valid():
+                # Check password
+                if not self.object.check_password(serializer.data.get("password")):
+                    return Response({"password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+                # set_password also hashes the password that the user will get
+                self.object.name=serializer.data.get("name")
+                self.object.save()
+                response = {
+                    'status': 'success',
+                    'code': status.HTTP_200_OK,
+                    'message': 'Name updated successfully',
+                    'data': []
+                }
+
+                return Response(response)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class UserView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     lookup_field = 'pk'
