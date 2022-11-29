@@ -10,6 +10,9 @@ from django.contrib.auth import login, logout
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated   
 from .permissions import *
+from .paginations import *
+from django_filters.rest_framework import DjangoFilterBackend
+from django.utils.decorators import method_decorator
 # Create your views here.
 
 
@@ -22,6 +25,7 @@ class expAIViewSet(viewsets.ModelViewSet):
     """
     queryset = Softwarelibs.objects.all()
     serializer_class = SoftwareLibsSerializer
+    schema_tags = ["EXPAIVIEWSET"]
 
 class AccountsViewSet(viewsets.ModelViewSet):
     """
@@ -30,9 +34,13 @@ class AccountsViewSet(viewsets.ModelViewSet):
 
     Additionally we also provide an extra `checkBody` action.
     """
-    permission_classes = (IsAdmin,)
+    # permission_classes = (IsAdmin,)
     queryset = User.objects.all()
+    pagination_class = LargeResultsSetPagination
     serializer_class = UserSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['email', 'name']
+    schema_tags = ["model", "list"]
 class ChangeUserPasswordView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = ChangePassword2Serializer
@@ -54,12 +62,11 @@ class CsrfExemptSessionAuthentication(authentication.SessionAuthentication):
     def enforce_csrf(self, request):
         return
 
-
 class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
     permission_classes = (permissions.AllowAny,)
     authentication_classes = (CsrfExemptSessionAuthentication,)
-
+    @swagger_auto_schema(tags=['fasdf'])
     def post(self, serializer):
         serializer = LoginSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
@@ -67,13 +74,13 @@ class LoginView(generics.CreateAPIView):
         login(self.request, user)
         return response.Response(UserSerializer(user).data)
 
-
+@swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
 class LogoutView(views.APIView):
     def post(self, request):
         logout(request)
         return response.Response()
 
-
+@swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = (permissions.AllowAny,)

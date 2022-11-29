@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework', ## add here
     'expAI.apps.expAIConfig', # register your apps
     'drf_yasg', # swagger
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +133,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # pagination
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 2,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 # how to disable the Browsable API in production
