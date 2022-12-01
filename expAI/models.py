@@ -48,6 +48,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField('Is active', default=True)
     joined_at = models.DateTimeField('Joined at', default=timezone.now)
     roleid = models.ForeignKey('roles', models.DO_NOTHING, db_column='roleid', blank=True, null=True)
+    usrclass = models.ManyToManyField('class', db_column='usrclass', blank=True, null=True)
+    usrfullname = models.CharField(db_column='usrFullName', max_length=50, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    usrdob = models.DateField(db_column='usrDoB', blank=True, null=True)  # Field name made lowercase.
+    usrfaculty = models.CharField(db_column='usrFaculty', max_length=45, blank=True, null=True)  # Field name made lowercase.
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -61,7 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Users'
 
     def get_full_name(self):
-        return self.name
+        return self.usrfullname
 
     def get_short_name(self):
         return self.name
@@ -69,7 +73,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Datasets(models.Model):
     datasetid = models.CharField(db_column='datasetID', primary_key=True, max_length=20)  # Field name made lowercase.
     datasetname = models.CharField(db_column='datasetName', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    datasettype = models.CharField(db_column='datasetType', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    datasettype = models.ForeignKey("TypePermission", models.DO_NOTHING,db_column='datasetType', blank=True, null=True)  # Field name made lowercase.
+    datasetproblem = models.ForeignKey("Problem", models.DO_NOTHING,db_column='datasetProblem', blank=True, null=True)  # Field name made lowercase.
     datasetfolderurl = models.CharField(db_column='datasetFolderURL', max_length=200, blank=True, null=True)  # Field name made lowercase.
     datasettraining = models.IntegerField(db_column='datasetTraining', blank=True, null=True)  # Field name made lowercase.
     datasettesting = models.IntegerField(db_column='datasetTesting', blank=True, null=True)  # Field name made lowercase.
@@ -77,7 +82,7 @@ class Datasets(models.Model):
     datasetcreator = models.CharField(db_column='datasetCreator', max_length=20, blank=True, null=True)  # Field name made lowercase.
     datasetcreatedtime = models.DateTimeField(db_column='datasetCreatedTime', blank=True, null=True)  # Field name made lowercase.
     datasetdescription = models.CharField(db_column='datasetDescription', max_length=200, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
-
+    datasetowner = models.ForeignKey("User", models.DO_NOTHING, db_column='datasetOwner', blank=True, null=True)
     class Meta:
         managed = True
         db_table = 'datasets'
@@ -99,7 +104,7 @@ class Experiments(models.Model):
     expid = models.CharField(db_column='expID', primary_key=True, max_length=20)  # Field name made lowercase.
     expname = models.CharField(db_column='expName', max_length=100, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
     exptype = models.CharField(db_column='expType', max_length=10, blank=True, null=True)  # Field name made lowercase.
-    expcreatorid = models.ForeignKey('Users', models.DO_NOTHING, db_column='expCreatorID', blank=True, null=True)  # Field name made lowercase.
+    expcreatorid = models.ForeignKey('User', models.DO_NOTHING, db_column='expCreatorID', blank=True, null=True)  # Field name made lowercase.
     expcreatedtime = models.DateTimeField(db_column='expCreatedTime', blank=True, null=True)  # Field name made lowercase.
     expmodelid = models.ForeignKey('Models', models.DO_NOTHING, db_column='expModelID', blank=True, null=True)  # Field name made lowercase.
     expdatasetid = models.ForeignKey(Datasets, models.DO_NOTHING, db_column='expDatasetID', blank=True, null=True)  # Field name made lowercase.
@@ -201,15 +206,25 @@ class Softwarelibs(models.Model):
         managed = True
         db_table = 'softwarelibs'
 
-
-class Users(models.Model):
-    usrid = models.CharField(db_column='usrID', primary_key=True, max_length=20, default="")  # Field name made lowercase.
-    usrfullname = models.CharField(db_column='usrFullName', max_length=50, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
-    usrdob = models.DateField(db_column='usrDoB', blank=True, null=True)  # Field name made lowercase.
-    usrclass = models.CharField(db_column='usrClass', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    usrfaculty = models.CharField(db_column='usrFaculty', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    usraccid = models.OneToOneField('User', db_column='id', max_length=20, blank=True, null=True, on_delete=models.DO_NOTHING)  # Field name made lowercase.
-
+class Class(models.Model):
+    classid = models.CharField(db_column= "classID", primary_key=True, max_length=20)
+    classcode = models.CharField(db_column="classCode", max_length=45, blank=True, null=True)
+    classname = models.CharField(db_column="className", max_length=45, blank=True, null=True)
+    classschoolyear=models.CharField(db_column="classSchoolYear", max_length=10, blank=True, null=True)
     class Meta:
         managed = True
-        db_table = 'users2'
+        db_table = 'Class'
+
+class TypePermission(models.Model):
+    typeid = models.AutoField(primary_key=True)
+    typename = models.CharField(db_column="typeName", max_length=20, blank=True, null=True)
+    class Meta:
+        managed = True
+        db_table="TypePermission"
+
+class Problem(models.Model):
+    problemid = models.AutoField(primary_key=True)
+    problemname = models.CharField(db_column="problemName", max_length=80, blank=True, null=True)
+    class Meta:
+        managed = True
+        db_table = "Problem"

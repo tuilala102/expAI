@@ -5,13 +5,15 @@ class IsOwner(BasePermission):
        Allows access only to owners
     """
 
-    def has_permission(self, request, view, obj):
+    def has_object_permission(self, request, view, obj):
        
-        if request.user in obj.authors :
+        if request.user == obj.datasetowner:
             return True
 
         return False
-
+class IsOwnerOfObject(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj == request.user
 
 class IsAdmin(BasePermission):
 

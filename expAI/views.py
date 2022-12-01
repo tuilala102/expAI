@@ -13,6 +13,7 @@ from .permissions import *
 from .paginations import *
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
+from rest_framework.parsers import FileUploadParser, FormParser,MultiPartParser
 # Create your views here.
 
 
@@ -25,7 +26,35 @@ class expAIViewSet(viewsets.ModelViewSet):
     """
     queryset = Softwarelibs.objects.all()
     serializer_class = SoftwareLibsSerializer
-    schema_tags = ["EXPAIVIEWSET"]
+    
+class DatasetsViewSet(viewsets.ModelViewSet):
+    """
+    This viewset automatically provides `list`, `create`, `retrieve`,
+    `update` and `destroy` actions.
+
+    Additionally we also provide an extra `checkBody` action.
+    """
+    
+    serializer_class = DatasetsSerializer
+    permission_classes = [IsOwner | IsAdmin]
+    def get_queryset(self):
+        usr = self.request.user
+        usr = User.objects.get(email=usr.email)
+        if usr.roleid.rolename=="ADMIN":
+            queryset=Datasets.objects.all()
+        elif usr.roleid.rolename=="STUDENT":
+            queryset = Datasets.objects.filter(datasettype=1)|Datasets.objects.filter(datasetowner = self.request.user) 
+        else:
+            usrclass= list(usr.usrclass.all()) 
+            student = [list(i.user_set.all())  for i in usrclass]
+            student = sum(student,[])
+            queryset = Datasets.objects.filter(datasettype=1)|Datasets.objects.filter(datasetowner__in = student) 
+
+        return queryset
+    def perform_create(self, serializer):
+        serializer.save(datasetowner=self.request.user)
+    
+    
 
 class AccountsViewSet(viewsets.ModelViewSet):
     """
@@ -40,7 +69,7 @@ class AccountsViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['email', 'name']
-    schema_tags = ["model", "list"]
+    
 class ChangeUserPasswordView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = ChangePassword2Serializer
@@ -66,7 +95,7 @@ class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
     permission_classes = (permissions.AllowAny,)
     authentication_classes = (CsrfExemptSessionAuthentication,)
-    @swagger_auto_schema(tags=['fasdf'])
+    @swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
     def post(self, serializer):
         serializer = LoginSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
@@ -74,18 +103,19 @@ class LoginView(generics.CreateAPIView):
         login(self.request, user)
         return response.Response(UserSerializer(user).data)
 
-@swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
+
 class LogoutView(views.APIView):
+    @swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
     def post(self, request):
         logout(request)
         return response.Response()
-
-@swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
+@method_decorator(name="post", decorator=swagger_auto_schema(tags=["Đăng nhập - Đăng ký"]))
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = (permissions.AllowAny,)
-
+    @swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
     def perform_create(self, serializer):
+        
         user = serializer.save()
         user.backend = settings.AUTHENTICATION_BACKENDS[0]
         login(self.request, user)
@@ -102,7 +132,7 @@ class ChangePasswordView(generics.UpdateAPIView):
         def get_object(self, queryset=None):
             obj = self.request.user
             return obj
-
+        @swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
         def update(self, request, *args, **kwargs):
             self.object = self.get_object()
             serializer = self.get_serializer(data=request.data)
@@ -260,3 +290,25 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
         obj = Models.objects.get(modelid = id_model)
         return Response({"result": obj.modelname})
+import zipfile
+import uuid
+import os
+class DatasetsUploadView(views.APIView):
+    parser_classes = [FormParser,MultiPartParser]
+
+    def post(self, request):
+        file_obj = request.data['file']
+        new_name = uuid.uuid4()
+        
+        with zipfile.ZipFile(file_obj, mode='r', allowZip64=True) as file:
+            
+            directory_to_extract = f"datasets/{new_name}"
+            file.extractall(directory_to_extract)
+
+        response = {
+                    'status': 'success',
+                    'code': status.HTTP_201_CREATED,
+                    'message': 'Data uploaded successfully',
+                    'data': new_name
+                }
+        return Response(response)

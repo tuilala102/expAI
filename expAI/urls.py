@@ -27,6 +27,7 @@ router = DefaultRouter()
 router.register(r'expAIs', views.expAIViewSet,basename="expAIs")
 router.register(r'accounts', views.AccountsViewSet, basename="AVB")
 router.register(r'experiment',views.ExperimentsViewSet, basename="LK")
+router.register(r'datasets',views.DatasetsViewSet, basename="LK")
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
@@ -35,9 +36,8 @@ urlpatterns = [
         re_path(r'^register/$', views.RegisterView.as_view(), name='user-register'),
     re_path(r'^login/$', views.LoginView.as_view(), name='user-login'),
     re_path(r'^logout/$', views.LogoutView.as_view(), name='user-logout', ),
-    re_path(r'^current/$', views.UserView.as_view(), name='user-current'),
+    re_path(r'^my-infor/$', views.UserView.as_view(), name='user-current'),
     re_path(r'^change-password/$', views.ChangePasswordView.as_view(), name='change-password'),
-    re_path(r'^change-password-2/$', views.ChangeUserPasswordView.as_view(), name='change-password'),
-    re_path(r'^change-name-2/$', views.ChangeNameView.as_view(), name='change-name-2'),
-    re_path(r'^delete-user-2/$', views.DeleteUserView.as_view(), name='delete-user'),
+    re_path(r'^change-infor/$', views.ChangeNameView.as_view(), name='change-name-2'),
+    re_path(r'^upload-datasets-zip/$', views.DatasetsUploadView.as_view(), name='c'),
 ]

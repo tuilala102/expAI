@@ -37,6 +37,10 @@ class ChangeNameSerializer(serializers.Serializer):
     """
     password = serializers.CharField(required=True)
     name = serializers.CharField(required=True)
+    usrclass = serializers.CharField(required=True)
+    usrfullname = serializers.CharField(required=True)
+    usrdob = serializers.CharField(required=True)
+    usrfaculty = serializers.CharField(required=True)
 class DestroyUserSerializer(serializers.Serializer):
     model = User
 
@@ -69,8 +73,12 @@ class UserSerializer(serializers.ModelSerializer):
             'joined_at',
             'password',
             'is_staff',
+            'usrclass',
+            'usrfullname',
+            'usrdob', 
+            'usrfaculty'
         )
-        read_only_fields = ('last_login', 'is_active', 'joined_at')
+        read_only_fields = ('is_staff','last_login', 'is_active', 'joined_at')
         extra_kwargs = {
             'password': {'required': True, 'write_only': True},
             'name': {'required': True}
@@ -103,3 +111,11 @@ class ExperimentsSerializer(ModelSerializer):
         model = Experiments
         fields = ["expid","expname","exptype","expcreatorid","expcreatedtime",
         "expmodelid","expdatasetid","expfilelog","expsoftwarelibid","expaftertrainmodelpath"]
+
+
+class DatasetsSerializer(ModelSerializer):
+    class Meta:
+        model = Datasets
+        fields = ["datasetid","datasetname","datasettype","datasetproblem","datasetfolderurl","datasettraining",
+        "datasettesting","datasetsum","datasetcreator","datasetcreatedtime","datasetdescription", 'datasetowner']
+        read_only_fields = ('datasetowner',)
