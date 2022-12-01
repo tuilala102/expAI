@@ -37,9 +37,9 @@ class ChangeNameSerializer(serializers.Serializer):
     """
     password = serializers.CharField(required=True)
     name = serializers.CharField(required=True)
-    usrclass = serializers.CharField(required=True)
+    usrclass = serializers.ListField(required=True)
     usrfullname = serializers.CharField(required=True)
-    usrdob = serializers.CharField(required=True)
+    usrdob = serializers.DateField(required=True)
     usrfaculty = serializers.CharField(required=True)
 class DestroyUserSerializer(serializers.Serializer):
     model = User
