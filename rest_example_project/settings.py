@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'rest_example_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'expai',
+        'NAME': 'expai2',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
@@ -144,3 +144,5 @@ if DEBUG:
     REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = (
             "rest_framework.renderers.JSONRenderer",
         )
+
+AUTH_USER_MODEL = 'expAI.User'

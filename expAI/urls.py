@@ -23,13 +23,23 @@ schema_view = get_schema_view(
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 
-# router.register(r'sinhvien', views.expAIViewSet)
-# router.register(r'monhoc', views.MonthiViewSet)
-# router.register(r'diemthi', views.DiemthiViewSet)
-router.register(r'expAIs', views.expAIViewSet,basename="expAIs")
+
+router.register(r'softwarelibs', views.SoftwarelibsViewSet)
+router.register(r'accounts', views.AccountsViewSet)
+router.register(r'experiment',views.ExperimentsViewSet)
+router.register(r'models', views.ModelsViewSet)
+router.register(r'datasets', views.DatasetsViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+        re_path(r'^register/$', views.RegisterView.as_view(), name='user-register'),
+    re_path(r'^login/$', views.LoginView.as_view(), name='user-login'),
+    re_path(r'^logout/$', views.LogoutView.as_view(), name='user-logout'),
+    re_path(r'^current/$', views.UserView.as_view(), name='user-current'),
+    re_path(r'^change-password/$', views.ChangePasswordView.as_view(), name='change-password'),
+    re_path(r'^change-password-2/$', views.ChangeUserPasswordView.as_view(), name='change-password-2'),
+    re_path(r'^change-name-2/$', views.ChangeNameView.as_view(), name='change-name-2'),
+    re_path(r'^delete-user-2/$', views.DeleteUserView.as_view(), name='delete-user'),
 ]
