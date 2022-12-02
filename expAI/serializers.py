@@ -103,3 +103,16 @@ class ExperimentsSerializer(ModelSerializer):
         model = Experiments
         fields = ["expid","expname","exptype","expcreatorid","expcreatedtime",
         "expmodelid","expdatasetid","expfilelog","expsoftwarelibid","expaftertrainmodelpath"]
+        
+class ModelsSerializer(ModelSerializer):
+    class Meta:
+        model = Models
+        fields = ["modelid","modelname","modeltype","modelfiletutorial","modelfiledescription",
+        "modeldescription","modeleventtype","modelcreator","modelcreatedtime","modelsoftlibid"]
+        
+class DatasetsSerializer(ModelSerializer):
+    class Meta:
+        model = Datasets
+        fields = ["datasetid","datasetname","datasettype","datasetfolderurl","datasettraining",
+        "datasettesting","datasetsum","datasetcreator","datasetcreatedtime","datasetdescription"]
+    

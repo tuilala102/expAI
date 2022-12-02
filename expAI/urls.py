@@ -24,9 +24,11 @@ schema_view = get_schema_view(
 router = DefaultRouter()
 
 
-router.register(r'expAIs', views.expAIViewSet,basename="expAIs")
+router.register(r'softwarelibs', views.SoftwarelibsViewSet)
 router.register(r'accounts', views.AccountsViewSet)
 router.register(r'experiment',views.ExperimentsViewSet)
+router.register(r'models', views.ModelsViewSet)
+router.register(r'datasets', views.DatasetsViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [

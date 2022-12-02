@@ -13,7 +13,7 @@ from .permissions import *
 # Create your views here.
 
 
-class expAIViewSet(viewsets.ModelViewSet):
+class SoftwarelibsViewSet(viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
@@ -253,3 +253,10 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
         obj = Models.objects.get(modelid = id_model)
         return Response({"result": obj.modelname})
+class ModelsViewSet(viewsets.ModelViewSet):
+    queryset = Models.objects.all()
+    serializer_class = ModelsSerializer
+    
+class DatasetsViewSet(viewsets.ModelViewSet):
+    queryset = Datasets.objects.all()
+    serializer_class = DatasetsSerializer
