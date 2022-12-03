@@ -161,6 +161,8 @@ class Objects(models.Model):
 
 class Paramsconfigs(models.Model):
     configid = models.IntegerField(db_column='configID', primary_key=True)  # Field name made lowercase.
+    jsonstringparams = models.CharField(db_column='jsonStringParams', max_length=2500, blank=True, null=True)
+    trainningstatus = models.IntegerField(db_column='trainningstatus',default=1)
     configimagesize = models.CharField(db_column='configImageSize', max_length=45, blank=True, null=True)  # Field name made lowercase.
     configlearningrate = models.FloatField(db_column='configLearningRate', blank=True, null=True)  # Field name made lowercase.
     configalgorithm = models.CharField(db_column='configAlgorithm', max_length=45, blank=True, null=True)  # Field name made lowercase.

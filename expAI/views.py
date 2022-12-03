@@ -307,7 +307,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     id_paramsconfigs = openapi.Parameter('paramsconfig_json',openapi.IN_QUERY,description='json string paramsconfig',type=openapi.TYPE_STRING)
 
     @swagger_auto_schema(method='get',manual_parameters=[id_exp, paramsconfigs_json],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
-    @action(methods=['POST'], detail=False, url_path='start-train')
+    @action(methods=['GET'], detail=False, url_path='start-train')
     def start_train(self, request):
 
         """
@@ -318,12 +318,20 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         user = User.objects.get( id = user.pk)
 
         id_exp = request.query_params.get('id_exp')
+        paramsconfigs_json = request.query_params.get('paramsconfigs_json')
 
         exp = Experiments.objects.filter(expid = id_exp)
-        paramsconfigs = Paramsconfigs()
+        paramsconfigs = Paramsconfigs(jsonstringparams=paramsconfigs_json,trainningstatus=1)
         paramsconfigs.save()
 
-        return Response(status=200)
+        response = {
+            'status': 'success',
+            'code': status.HTTP_200_OK,
+            'message': 'Start tranning',
+            'data': paramsconfigs
+        }
+
+        return response
 
     
     
@@ -340,12 +348,21 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         user = User.objects.get( id = user.pk)
 
         id_exp = request.query_params.get('id_exp')
+        id_paramsconfigs = request.query_params.get('id_paramsconfigs')
 
         exp = Experiments.objects.filter(expid = id_exp)
-        paramsconfigs = Paramsconfigs()
-        paramsconfigs.save()
+        paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
 
-        return Response(status=200)
+
+
+        response = {
+            'status': 'success',
+            'code': status.HTTP_200_OK,
+            'message': 'Stop tranning',
+            'data': []
+        }
+
+        return response
     
 import zipfile
 import uuid
