@@ -251,17 +251,102 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     queryset = Experiments.objects.all()
     serializer_class = ExperimentsSerializer
 
-    param1 = openapi.Parameter('id_model',openapi.IN_QUERY,description='id cua model',type=openapi.TYPE_NUMBER)
-    @swagger_auto_schema(method='get',manual_parameters=[param1],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
-    @action(methods=['GET'], detail=False, url_path='get-models-name')
-    def get_model_name(self, request):
-        """
-        get model name API
-        """
-        id_model = request.query_params.get('id_model')
+    @swagger_auto_schema(method='get',manual_parameters=[],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-list-exps')
+    def get_list_exps(self, request):
 
-        obj = Models.objects.get(modelid = id_model)
-        return Response({"result": obj.modelname})
+        """
+        lay ds bai thi nghiem theo id user
+        """
+        
+        user = request.user
+        user = User.objects.get( id = user.pk)
+
+
+        epxs = Experiments.objects.filter(expcreatorid = user.id)
+        return Response({"result": epxs})
+
+    id_softlib = openapi.Parameter('id_softlib',openapi.IN_QUERY,description='id cua softlib',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-list-models')
+    def get_list_models(self, request):
+
+        """
+        lay ds model theo id softlib
+        """
+
+        id_softlib = request.query_params.get('id_softlib')
+
+        models = Models.objects.filter(modelsoftlibid = id_softlib)
+        return Response({"result": models})
+
+    #id_softlib = openapi.Parameter('id_softlib',openapi.IN_QUERY,description='id cua softlib',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-list-models')
+    def get_list_datasets(self, request):
+        usr = self.request.user
+        usr = User.objects.get(email=usr.email)
+
+        id_softlib = request.query_params.get('id_softlib')
+
+        if usr.roleid.rolename=="ADMIN":
+            queryset=Datasets.objects.all()
+        elif usr.roleid.rolename=="STUDENT":
+            queryset = Datasets.objects.filter(datasettype=1,expsoftwarelibid__pk = id_softlib)|Datasets.objects.filter(datasetowner = self.request.user,expsoftwarelibid__pk = id_softlib) 
+        else:#giao vien
+            usrclass= list(usr.usrclass.all()) 
+            student = [list(i.user_set.all())  for i in usrclass]
+            student = sum(student,[])
+            queryset = Datasets.objects.filter(datasettype=1,expsoftwarelibid__pk = id_softlib)|Datasets.objects.filter(datasetowner__in = student,expsoftwarelibid__pk = id_softlib) 
+
+        return queryset
+
+    #start - stop train 
+    id_exp = openapi.Parameter('id_exp',openapi.IN_QUERY,description='id cua exp',type=openapi.TYPE_NUMBER)
+    paramsconfigs_json = openapi.Parameter('paramsconfigs_json',openapi.IN_QUERY,description='json string paramsconfig',type=openapi.TYPE_STRING)
+    id_paramsconfigs = openapi.Parameter('paramsconfig_json',openapi.IN_QUERY,description='json string paramsconfig',type=openapi.TYPE_STRING)
+
+    @swagger_auto_schema(method='get',manual_parameters=[id_exp, paramsconfigs_json],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['POST'], detail=False, url_path='start-train')
+    def start_train(self, request):
+
+        """
+        start train
+        """
+        
+        user = request.user
+        user = User.objects.get( id = user.pk)
+
+        id_exp = request.query_params.get('id_exp')
+
+        exp = Experiments.objects.filter(expid = id_exp)
+        paramsconfigs = Paramsconfigs()
+        paramsconfigs.save()
+
+        return Response(status=200)
+
+    
+    
+    
+    @swagger_auto_schema(method='get',manual_parameters=[id_exp, id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['GET'], detail=False, url_path='stop-train')
+    def stop_train(self, request):
+
+        """
+        stop train
+        """
+        
+        user = request.user
+        user = User.objects.get( id = user.pk)
+
+        id_exp = request.query_params.get('id_exp')
+
+        exp = Experiments.objects.filter(expid = id_exp)
+        paramsconfigs = Paramsconfigs()
+        paramsconfigs.save()
+
+        return Response(status=200)
+    
 import zipfile
 import uuid
 import os

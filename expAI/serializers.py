@@ -116,6 +116,6 @@ class ExperimentsSerializer(ModelSerializer):
 class DatasetsSerializer(ModelSerializer):
     class Meta:
         model = Datasets
-        fields = ["datasetid","datasetname","datasettype","datasetproblem","datasetfolderurl","datasettraining",
+        fields = ["datasetid","datasetname","datasettype","expsoftwarelibid","datasetfolderurl","datasettraining",
         "datasettesting","datasetsum","datasetcreator","datasetcreatedtime","datasetdescription", 'datasetowner']
         read_only_fields = ('datasetowner',)

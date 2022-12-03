@@ -74,7 +74,7 @@ class Datasets(models.Model):
     datasetid = models.CharField(db_column='datasetID', primary_key=True, max_length=20)  # Field name made lowercase.
     datasetname = models.CharField(db_column='datasetName', max_length=100, blank=True, null=True)  # Field name made lowercase.
     datasettype = models.ForeignKey("TypePermission", models.DO_NOTHING,db_column='datasetType', blank=True, null=True)  # Field name made lowercase.
-    datasetproblem = models.ForeignKey("Problem", models.DO_NOTHING,db_column='datasetProblem', blank=True, null=True)  # Field name made lowercase.
+    expsoftwarelibid = models.ForeignKey('Softwarelibs', models.DO_NOTHING, db_column='expSoftwareLibID', blank=True, null=True)  # Field name made lowercase.
     datasetfolderurl = models.CharField(db_column='datasetFolderURL', max_length=200, blank=True, null=True)  # Field name made lowercase.
     datasettraining = models.IntegerField(db_column='datasetTraining', blank=True, null=True)  # Field name made lowercase.
     datasettesting = models.IntegerField(db_column='datasetTesting', blank=True, null=True)  # Field name made lowercase.
@@ -222,9 +222,9 @@ class TypePermission(models.Model):
         managed = True
         db_table="TypePermission"
 
-class Problem(models.Model):
-    problemid = models.AutoField(primary_key=True)
-    problemname = models.CharField(db_column="problemName", max_length=80, blank=True, null=True)
-    class Meta:
-        managed = True
-        db_table = "Problem"
+# class Problem(models.Model):
+#     problemid = models.AutoField(primary_key=True)
+#     problemname = models.CharField(db_column="problemName", max_length=80, blank=True, null=True)
+#     class Meta:
+#         managed = True
+#         db_table = "Problem"
