@@ -80,9 +80,9 @@ WSGI_APPLICATION = 'rest_example_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'expai2',
+        'NAME': 'expai',
         'USER': 'root',
-        'PASSWORD': '01102000',
+        'PASSWORD': 'root',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }

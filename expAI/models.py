@@ -121,13 +121,15 @@ class Models(models.Model):
     modelid = models.CharField(db_column='modelID', primary_key=True, max_length=20)  # Field name made lowercase.
     modelname = models.CharField(db_column='modelName', max_length=100, blank=True, null=True)  # Field name made lowercase.
     modeltype = models.CharField(db_column='modelType', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    expsoftwarelibid = models.ForeignKey('Softwarelibs', models.DO_NOTHING, db_column='expSoftwareLibID', blank=True, null=True)  # Field name made lowercase.
     modelfiletutorial = models.CharField(db_column='modelFIleTutorial', max_length=200, blank=True, null=True)  # Field name made lowercase.
     modelfiledescription = models.CharField(db_column='modelFileDescription', max_length=200, blank=True, null=True)  # Field name made lowercase.
     modeldescription = models.CharField(db_column='modelDescription', max_length=45, blank=True, null=True)  # Field name made lowercase.
     modeleventtype = models.CharField(db_column='modelEventType', max_length=45, blank=True, null=True)  # Field name made lowercase.
     modelcreator = models.CharField(db_column='modelCreator', max_length=20, blank=True, null=True)  # Field name made lowercase.
     modelcreatedtime = models.DateTimeField(db_column='modelCreatedTime', blank=True, null=True)  # Field name made lowercase.
-    modelsoftlibid = models.CharField(db_column='modelSoftLibID', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    #modelsoftlibid = models.CharField(db_column='modelSoftLibID', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    modelowner = models.ForeignKey("User", models.DO_NOTHING, db_column='modelOwner', blank=True, null=True)
 
     class Meta:
         managed = True
