@@ -36,6 +36,7 @@ class expAIViewSet(viewsets.ModelViewSet):
 @method_decorator(name="list", decorator=swagger_auto_schema(manual_parameters=[openapi.Parameter('datasetName', openapi.IN_QUERY, description='Tên bộ dữ liệu', type=openapi.TYPE_STRING)
     ,openapi.Parameter('datasetSumFrom', openapi.IN_QUERY, description='Cận dưới số lượng', type=openapi.TYPE_INTEGER),
     openapi.Parameter('datasetSumTo', openapi.IN_QUERY, description='Cận trên số lượng', type=openapi.TYPE_INTEGER),
+    openapi.Parameter('datasetOwner', openapi.IN_QUERY, description='ID người tạo', type=openapi.TYPE_INTEGER),
     openapi.Parameter('datasetProb', openapi.IN_QUERY, description='Bài toán áp dụng', type=openapi.TYPE_INTEGER)]))
 class DatasetsViewSet(viewsets.ModelViewSet):
     """
@@ -72,9 +73,11 @@ class DatasetsViewSet(viewsets.ModelViewSet):
         datasetProb = self.request.query_params.get('datasetProb')
         datasetSumTo = self.request.query_params.get('datasetSumTo')
         datasetSumFrom = self.request.query_params.get('datasetSumFrom')
+        datasetOwner = self.request.query_params.get('datasetOwner')
         queryset = queryset.filter(datasetsum__lte=datasetSumTo) if datasetSumTo !=None else queryset
         queryset = queryset.filter(datasetsum__gte=datasetSumFrom) if datasetSumFrom !=None else queryset
         queryset = queryset.filter(datasetproblem=datasetProb) if datasetProb !=None else queryset
+        queryset = queryset.filter(datasetowner=datasetOwner) if datasetOwner !=None else queryset
         queryset = queryset.filter(datasetname__icontains=datasetname) if datasetname !=None else queryset
         return queryset
 
