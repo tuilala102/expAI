@@ -18,5 +18,5 @@ class Migration(migrations.Migration):
             name='class',
             table='Class',
         ),
-        migrations.RunSQL("INSERT INTO `expai2`.`class` (`classID`, `classCode`, `className`, `classSchoolYear`) VALUES ('1', 'KHMT001', 'Khoa học máy tính K57', '2020-2021');")
+        migrations.RunSQL("INSERT INTO `class` (`classID`, `classCode`, `className`, `classSchoolYear`) VALUES ('1', 'KHMT001', 'Khoa học máy tính K57', '2020-2021');")
     ]

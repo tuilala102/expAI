@@ -43,10 +43,10 @@ class Migration(migrations.Migration):
             name='datasettype',
             field=models.ForeignKey(blank=True, db_column='datasetType', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='expAI.typepermission'),
         ),
-        migrations.RunSQL("INSERT INTO `expai2`.`typepermission` (`typeid`, `typeName`) VALUES ('1', 'PUBLIC');"),
-        migrations.RunSQL("INSERT INTO `expai2`.`typepermission` (`typeid`, `typeName`) VALUES ('0', 'PRIVATE');"),
+        migrations.RunSQL("INSERT INTO `typepermission` (`typeid`, `typeName`) VALUES ('1', 'PUBLIC');"),
+        migrations.RunSQL("INSERT INTO `typepermission` (`typeid`, `typeName`) VALUES ('0', 'PRIVATE');"),
 
-        migrations.RunSQL("INSERT INTO `expai2`.`problem` (`problemid`, `problemName`) VALUES ('1', 'FACE_RECOG');"),
-        migrations.RunSQL("INSERT INTO `expai2`.`problem` (`problemid`, `problemName`) VALUES ('2', 'FACE_DETECT');"),
-        migrations.RunSQL("INSERT INTO `expai2`.`problem` (`problemid`, `problemName`) VALUES ('0', 'ACTION_ABNORMAL');"),
+        migrations.RunSQL("INSERT INTO `problem` (`problemid`, `problemName`) VALUES ('1', 'FACE_RECOG');"),
+        migrations.RunSQL("INSERT INTO `problem` (`problemid`, `problemName`) VALUES ('2', 'FACE_DETECT');"),
+        migrations.RunSQL("INSERT INTO `problem` (`problemid`, `problemName`) VALUES ('0', 'ACTION_ABNORMAL');"),
     ]

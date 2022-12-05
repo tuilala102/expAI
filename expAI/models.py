@@ -35,7 +35,7 @@ class UserManager(BaseUserManager):
 
     def create_user(self, email, password, **extra_fields):
         role = Roles.objects.get(rolename="STUDENT")
-        return self._create_user(email, password, is_superuser= False, roleid = role, **extra_fields)
+        return self._create_user(email, password, is_superuser= False, is_staff=False, roleid = role, **extra_fields)
     
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, True, True, **extra_fields)
@@ -74,7 +74,7 @@ class Datasets(models.Model):
     datasetid = models.CharField(db_column='datasetID', primary_key=True, max_length=20)  # Field name made lowercase.
     datasetname = models.CharField(db_column='datasetName', max_length=100, blank=True, null=True)  # Field name made lowercase.
     datasettype = models.ForeignKey("TypePermission", models.DO_NOTHING,db_column='datasetType', blank=True, null=True)  # Field name made lowercase.
-    datasetproblem = models.ForeignKey("Problem", models.DO_NOTHING,db_column='datasetProblem', blank=True, null=True)  # Field name made lowercase.
+    datasetsoftID = models.ForeignKey("SoftwareLibs", models.DO_NOTHING,db_column='datasetsoftID', blank=True, null=True)  # Field name made lowercase.
     datasetfolderurl = models.CharField(db_column='datasetFolderURL', max_length=200, blank=True, null=True)  # Field name made lowercase.
     datasettraining = models.IntegerField(db_column='datasetTraining', blank=True, null=True)  # Field name made lowercase.
     datasettesting = models.IntegerField(db_column='datasetTesting', blank=True, null=True)  # Field name made lowercase.
@@ -197,7 +197,7 @@ class Roles(models.Model):
 
 
 class Softwarelibs(models.Model):
-    softwarelibid = models.CharField(db_column='softwarelibID', primary_key=True, max_length=20)  # Field name made lowercase.
+    softwarelibid = models.AutoField(db_column='softwarelibID', primary_key=True)  # Field name made lowercase.
     softwarelibname = models.CharField(db_column='softwarelibName', max_length=45, blank=True, null=True)  # Field name made lowercase.
     softwareliburl = models.CharField(db_column='softwarelibURL', max_length=200, blank=True, null=True)  # Field name made lowercase.
     softwarelibdescription = models.CharField(db_column='softwarelibDescription', max_length=1000, blank=True, null=True)  # Field name made lowercase.
@@ -222,9 +222,3 @@ class TypePermission(models.Model):
         managed = True
         db_table="TypePermission"
 
-class Problem(models.Model):
-    problemid = models.AutoField(primary_key=True)
-    problemname = models.CharField(db_column="problemName", max_length=80, blank=True, null=True)
-    class Meta:
-        managed = True
-        db_table = "Problem"

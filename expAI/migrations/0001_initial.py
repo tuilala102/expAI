@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('is_staff', models.BooleanField(default=False, verbose_name='Is staff')),
                 ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
                 ('joined_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Joined at')),
-                ('usrfullname', models.CharField(blank=True, db_collation='utf8mb3_general_ci', db_column='usrFullName', max_length=50, null=True)),
+                ('usrfullname', models.CharField(blank=True,  db_column='usrFullName', max_length=50, null=True)),
                 ('usrdob', models.DateField(blank=True, db_column='usrDoB', null=True)),
                 ('usrclass', models.CharField(blank=True, db_column='usrClass', max_length=45, null=True)),
                 ('usrfaculty', models.CharField(blank=True, db_column='usrFaculty', max_length=45, null=True)),
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
                 ('datasetsum', models.IntegerField(blank=True, db_column='datasetSum', null=True)),
                 ('datasetcreator', models.CharField(blank=True, db_column='datasetCreator', max_length=20, null=True)),
                 ('datasetcreatedtime', models.DateTimeField(blank=True, db_column='datasetCreatedTime', null=True)),
-                ('datasetdescription', models.CharField(blank=True, db_collation='utf8mb3_general_ci', db_column='datasetDescription', max_length=200, null=True)),
+                ('datasetdescription', models.CharField(blank=True,  db_column='datasetDescription', max_length=200, null=True)),
                 ('datasetowner', models.ForeignKey(blank=True, db_column='datasetOwner', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -76,7 +76,7 @@ class Migration(migrations.Migration):
             name='Experiments',
             fields=[
                 ('expid', models.CharField(db_column='expID', max_length=20, primary_key=True, serialize=False)),
-                ('expname', models.CharField(blank=True, db_collation='utf8mb3_general_ci', db_column='expName', max_length=100, null=True)),
+                ('expname', models.CharField(blank=True,  db_column='expName', max_length=100, null=True)),
                 ('exptype', models.CharField(blank=True, db_column='expType', max_length=10, null=True)),
                 ('expcreatedtime', models.DateTimeField(blank=True, db_column='expCreatedTime', null=True)),
                 ('expfilelog', models.CharField(blank=True, db_column='expFileLog', max_length=100, null=True)),
@@ -112,8 +112,8 @@ class Migration(migrations.Migration):
             name='Objects',
             fields=[
                 ('objid', models.CharField(db_column='objID', max_length=20, primary_key=True, serialize=False)),
-                ('objname', models.CharField(blank=True, db_collation='utf8mb3_general_ci', db_column='objName', max_length=50, null=True)),
-                ('objgeneralinfo', models.CharField(blank=True, db_collation='utf8mb3_general_ci', db_column='objGeneralInfo', max_length=500, null=True)),
+                ('objname', models.CharField(blank=True,  db_column='objName', max_length=50, null=True)),
+                ('objgeneralinfo', models.CharField(blank=True,  db_column='objGeneralInfo', max_length=500, null=True)),
                 ('objurlfolder', models.CharField(blank=True, db_column='objURLFolder', max_length=200, null=True)),
                 ('objcreatedtime', models.DateTimeField(blank=True, db_column='objCreatedTime', null=True)),
                 ('objcreator', models.CharField(blank=True, db_column='objCreator', max_length=20, null=True)),
@@ -213,7 +213,7 @@ class Migration(migrations.Migration):
                 'unique_together': {('objid', 'expid')},
             },
         ),
-        migrations.RunSQL("INSERT INTO `expai2`.`roles` (`roleID`, `roleName`) VALUES ('1', 'ADMIN');"),
-        migrations.RunSQL("INSERT INTO `expai2`.`roles` (`roleID`, `roleName`) VALUES ('2', 'TEACHER');"),
-        migrations.RunSQL("INSERT INTO `expai2`.`roles` (`roleID`, `roleName`) VALUES ('3', 'STUDENT');"),
+        migrations.RunSQL("INSERT INTO `roles` (`roleID`, `roleName`) VALUES ('1', 'ADMIN');"),
+        migrations.RunSQL("INSERT INTO `roles` (`roleID`, `roleName`) VALUES ('2', 'TEACHER');"),
+        migrations.RunSQL("INSERT INTO `roles` (`roleID`, `roleName`) VALUES ('3', 'STUDENT');"),
     ]

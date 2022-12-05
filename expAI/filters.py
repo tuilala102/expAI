@@ -6,7 +6,7 @@ class DatasetsFilter(django_filters.FilterSet):
         fields = {
             'datasetname': ['contains'],
             'datasettype': ['exact'],
-            'datasetproblem': ['exact'],
+            'datasetsoftID': ['exact'],
             'datasetfolderurl': ['contains'],
             'datasetdescription': ['contains'],
             

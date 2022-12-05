@@ -37,7 +37,7 @@ class ChangeNameSerializer(serializers.Serializer):
     """
     password = serializers.CharField(required=True)
     name = serializers.CharField(required=True)
-    usrclass = serializers.ListField(required=True)
+    # usrclass = serializers.ListField(required=True)
     usrfullname = serializers.CharField(required=True)
     usrdob = serializers.DateField(required=True)
     usrfaculty = serializers.CharField(required=True)
@@ -73,12 +73,12 @@ class UserSerializer(serializers.ModelSerializer):
             'joined_at',
             'password',
             'is_staff',
-            'usrclass',
+            
             'usrfullname',
             'usrdob', 
             'usrfaculty'
         )
-        read_only_fields = ('is_staff','last_login', 'is_active', 'joined_at')
+        read_only_fields = ( 'is_staff','last_login', 'is_active', 'joined_at')
         extra_kwargs = {
             'password': {'required': True, 'write_only': True},
             'name': {'required': True}
@@ -116,6 +116,6 @@ class ExperimentsSerializer(ModelSerializer):
 class DatasetsSerializer(ModelSerializer):
     class Meta:
         model = Datasets
-        fields = ["datasetid","datasetname","datasettype","datasetproblem","datasetfolderurl","datasettraining",
+        fields = ["datasetid","datasetname","datasettype","datasetfolderurl","datasettraining",
         "datasettesting","datasetsum","datasetcreator","datasetcreatedtime","datasetdescription", 'datasetowner']
         read_only_fields = ('datasetowner',)

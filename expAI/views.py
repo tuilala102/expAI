@@ -165,7 +165,7 @@ class RegisterView(generics.CreateAPIView):
 
     @swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
     def perform_create(self, serializer):
-
+        serializer.is_staff=False
         user = serializer.save()
         user.backend = settings.AUTHENTICATION_BACKENDS[0]
         login(self.request, user)
@@ -230,7 +230,7 @@ class ChangeNameView(generics.UpdateAPIView):
                 return Response({"password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
             # set_password also hashes the password that the user will get
             self.object.name = serializer.data.get("name")
-            self.object.usrclass.set(serializer.data.get("usrclass"))
+            # self.object.usrclass.set(serializer.data.get("usrclass"))
             self.object.usrdob = serializer.data.get("usrdob")
             self.object.usrfullname = serializer.data.get("usrfullname")
             self.object.usrfaculty = serializer.data.get("usrfaculty")
@@ -239,7 +239,7 @@ class ChangeNameView(generics.UpdateAPIView):
             response = {
                 'status': 'success',
                 'code': status.HTTP_200_OK,
-                'message': 'Name updated successfully',
+                'message': 'Infor updated successfully',
                 'data': []
             }
 
