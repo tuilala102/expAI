@@ -14,6 +14,8 @@ from .paginations import *
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
 from rest_framework.parsers import FileUploadParser, FormParser,MultiPartParser
+from .AI import *
+from django.http import JsonResponse
 # Create your views here.
 
 
@@ -248,26 +250,34 @@ class UserView(generics.RetrieveAPIView):
     #     return Response(StudientSerializer(objs).data)
 
 class ExperimentsViewSet(viewsets.ModelViewSet):
+    model = Experiments
     queryset = Experiments.objects.all()
     serializer_class = ExperimentsSerializer
+    pagination_class = LargeResultsSetPagination
 
     @swagger_auto_schema(method='get',manual_parameters=[],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
     @action(methods=['GET'], detail=False, url_path='get-list-exps')
     def get_list_exps(self, request):
-
         """
         lay ds bai thi nghiem theo id user
-        """
-        
-        user = request.user
-        user = User.objects.get( id = user.pk)
+        """        
+        usr = request.user
+        usr = User.objects.get( id = usr.pk)
+        if usr.roleid.rolename=="ADMIN":
+            queryset=Experiments.objects.all()
+        elif usr.roleid.rolename=="STUDENT":
+            queryset  = Experiments.objects.filter(expcreatorid = usr.id)
+        else:#giao vien
+            usrclass= list(usr.usrclass.all()) 
+            student = [list(i.user_set.all())  for i in usrclass]
+            student = sum(student,[])
+            queryset = Experiments.objects.filter(expcreatorid__in = student) | Experiments.objects.filter(expcreatorid = usr.id)
 
-
-        epxs = Experiments.objects.filter(expcreatorid = user.id)
-        return Response({"result": epxs})
+        serializer = ExperimentsSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     id_softlib = openapi.Parameter('id_softlib',openapi.IN_QUERY,description='id cua softlib',type=openapi.TYPE_NUMBER)
-    @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:ModelsSerializer})
     @action(methods=['GET'], detail=False, url_path='get-list-models')
     def get_list_models(self, request):
 
@@ -278,11 +288,13 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         id_softlib = request.query_params.get('id_softlib')
 
         models = Models.objects.filter(modelsoftlibid = id_softlib)
-        return Response({"result": models})
+        serializer = ModelsSerializer(models,many=True)
+
+        return Response(serializer.data)
 
     #id_softlib = openapi.Parameter('id_softlib',openapi.IN_QUERY,description='id cua softlib',type=openapi.TYPE_NUMBER)
-    @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
-    @action(methods=['GET'], detail=False, url_path='get-list-models')
+    @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:DatasetsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-list-dataset')
     def get_list_datasets(self, request):
         usr = self.request.user
         usr = User.objects.get(email=usr.email)
@@ -299,45 +311,73 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
             student = sum(student,[])
             queryset = Datasets.objects.filter(datasettype=1,expsoftwarelibid__pk = id_softlib)|Datasets.objects.filter(datasetowner__in = student,expsoftwarelibid__pk = id_softlib) 
 
-        return queryset
+        serializer = DatasetsSerializer(queryset,many=True)
+
+        return Response(serializer.data)
+    id_model = openapi.Parameter('id_model',openapi.IN_QUERY,description='id model',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[id_model],responses={404: 'Not found', 200:'ok', 201:ModelsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-default-parameters')
+    def get_default_parameters(self, request):
+
+        """
+        set-parameters
+        """
+
+        id_model = request.query_params.get('id_model')
+
+        models = Models.objects.get(modelid = id_model)
+        serializer = ModelsSerializer(models,many =False)
+        print(serializer)
+
+        return Response(serializer.data)
+        #elif request.method == 'POST':
+        #in start train method 
+
+
+
+    
 
     #start - stop train 
     id_exp = openapi.Parameter('id_exp',openapi.IN_QUERY,description='id cua exp',type=openapi.TYPE_NUMBER)
     paramsconfigs_json = openapi.Parameter('paramsconfigs_json',openapi.IN_QUERY,description='json string paramsconfig',type=openapi.TYPE_STRING)
-    id_paramsconfigs = openapi.Parameter('paramsconfig_json',openapi.IN_QUERY,description='json string paramsconfig',type=openapi.TYPE_STRING)
+    id_paramsconfigs = openapi.Parameter('id_paramsconfigs',openapi.IN_QUERY,description='id cua bang paramsconfig',type=openapi.TYPE_NUMBER)
 
-    @swagger_auto_schema(method='get',manual_parameters=[id_exp, paramsconfigs_json],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
-    @action(methods=['GET'], detail=False, url_path='start-train')
+    @swagger_auto_schema(manual_parameters=[id_exp, paramsconfigs_json],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['POST'], detail=False, url_path='start-train')
     def start_train(self, request):
 
         """
         start train
         """
         
-        user = request.user
-        user = User.objects.get( id = user.pk)
+        # user = request.user
+        # user = User.objects.get( id = user.pk)
 
         id_exp = request.query_params.get('id_exp')
         paramsconfigs_json = request.query_params.get('paramsconfigs_json')
 
-        exp = Experiments.objects.filter(expid = id_exp)
-        paramsconfigs = Paramsconfigs(jsonstringparams=paramsconfigs_json,trainningstatus=1)
-        paramsconfigs.save()
 
-        response = {
-            'status': 'success',
-            'code': status.HTTP_200_OK,
-            'message': 'Start tranning',
-            'data': paramsconfigs
-        }
+        if not check_json_file(paramsconfigs_json):
 
-        return response
+            exp = Experiments.objects.get(expid = id_exp)
+            paramsconfigs = Paramsconfigs(jsonstringparams=paramsconfigs_json,trainningstatus=1,configexpid=exp)
+            paramsconfigs.save()
+            serializer = ParamsconfigsSerializer(paramsconfigs,many = False)
+
+
+            return Response(serializer, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({
+                'message': 'Có một số lỗi với chuỗi json được nhập!'
+            },status=status.HTTP_400_BAD_REQUEST)
+            #return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
     
     
     
-    @swagger_auto_schema(method='get',manual_parameters=[id_exp, id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
-    @action(methods=['GET'], detail=False, url_path='stop-train')
+    @swagger_auto_schema(manual_parameters=[id_exp, id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['POST'], detail=False, url_path='stop-train')
     def stop_train(self, request):
 
         """
@@ -352,17 +392,54 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
         exp = Experiments.objects.filter(expid = id_exp)
         paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
+        paramsconfigs.trainningstatus = 0
+        paramsconfigs.save()
+        serializer = ParamsconfigsSerializer(paramsconfigs,many = False)
 
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(method='get',manual_parameters=[id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ResultsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-list-traning-results')
+    def get_list_traning_results(self, request):
 
-        response = {
-            'status': 'success',
-            'code': status.HTTP_200_OK,
-            'message': 'Stop tranning',
-            'data': []
-        }
+        """
+        get trainning results 
+        """
+        
+        # user = request.user
+        # user = User.objects.get( id = user.pk)
 
-        return response
+        # id_exp = request.query_params.get('id_exp')
+        id_paramsconfigs = request.query_params.get('id_paramsconfigs')
+
+        # exp = Experiments.objects.filter(expid = id_exp)
+        paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
+        queryset = Results.objects.filter(resultconfigid = paramsconfigs).order_by('resultid').values()
+        serializer = ResultsSerializer(queryset,many = True)
+        return Response(serializer.data)
+    pre_result_id = openapi.Parameter('pre_result_id',openapi.IN_QUERY,description='id của bản ghi trước đó, nếu gọi lần đầu thì để là 0',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ResultsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-traning-result')
+    def get_traning_result(self, request):
+
+        """
+        get trainning results 
+        """
+        
+        # user = request.user
+        # user = User.objects.get( id = user.pk)
+
+        # id_exp = request.query_params.get('id_exp')
+        id_paramsconfigs = request.query_params.get('id_paramsconfigs')
+        pre_result_id = request.query_params.get('pre_result_id')
+
+        # exp = Experiments.objects.filter(expid = id_exp)
+        paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
+        queryset = Results.objects.filter(resultconfigid = paramsconfigs).order_by('resultid').values()
+
+        serializer = ResultsSerializer(queryset,many = True)
+        return Response(serializer.data)
+
     
 import zipfile
 import uuid
