@@ -16,6 +16,7 @@ from django.utils.decorators import method_decorator
 from rest_framework.parsers import FileUploadParser, FormParser,MultiPartParser
 from .AI import *
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 
@@ -202,7 +203,7 @@ class UserView(generics.RetrieveAPIView):
     lookup_field = 'pk'
 
     def get_object(self, *args, **kwargs):
-        return self.request.user
+        return self.request.user 
     # # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     # # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
     # #                       IsOwnerOrReadOnly]
@@ -254,15 +255,17 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     queryset = Experiments.objects.all()
     serializer_class = ExperimentsSerializer
     pagination_class = LargeResultsSetPagination
+    permission_classes = [IsOwnerExp | IsAdmin]
 
-    @swagger_auto_schema(method='get',manual_parameters=[],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
-    @action(methods=['GET'], detail=False, url_path='get-list-exps')
-    def get_list_exps(self, request):
-        """
-        lay ds bai thi nghiem theo id user
-        """        
+    def list(self, request, *args, **kwargs):
+        '''
+        List all items
+        '''
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)        
         usr = request.user
         usr = User.objects.get( id = usr.pk)
+
         if usr.roleid.rolename=="ADMIN":
             queryset=Experiments.objects.all()
         elif usr.roleid.rolename=="STUDENT":
@@ -275,6 +278,46 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
         serializer = ExperimentsSerializer(queryset, many=True)
         return Response(serializer.data)
+    def create(self, request, *args, **kwargs):
+
+            
+            if request.user.id == None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            serializer = ExperimentsSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+
+                return JsonResponse({
+                    'message': 'Create a new exp successful!'
+                }, status=status.HTTP_201_CREATED)
+
+            return JsonResponse({
+                'message': 'Create a new exp unsuccessful!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # @swagger_auto_schema(method='get',manual_parameters=[],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    # @action(methods=['GET'], detail=False, url_path='get-list-exps')
+    # def get_list_exps(self, request):
+    #     """
+    #     lay ds bai thi nghiem theo id user
+    #     """
+    #     if request.user.id == None:
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)        
+    #     usr = request.user
+    #     usr = User.objects.get( id = usr.pk)
+
+    #     if usr.roleid.rolename=="ADMIN":
+    #         queryset=Experiments.objects.all()
+    #     elif usr.roleid.rolename=="STUDENT":
+    #         queryset  = Experiments.objects.filter(expcreatorid = usr.id)
+    #     else:#giao vien
+    #         usrclass= list(usr.usrclass.all()) 
+    #         student = [list(i.user_set.all())  for i in usrclass]
+    #         student = sum(student,[])
+    #         queryset = Experiments.objects.filter(expcreatorid__in = student) | Experiments.objects.filter(expcreatorid = usr.id)
+
+    #     serializer = ExperimentsSerializer(queryset, many=True)
+    #     return Response(serializer.data)
 
     id_softlib = openapi.Parameter('id_softlib',openapi.IN_QUERY,description='id cua softlib',type=openapi.TYPE_NUMBER)
     @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:ModelsSerializer})
@@ -284,6 +327,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         """
         lay ds model theo id softlib
         """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         id_softlib = request.query_params.get('id_softlib')
 
@@ -296,6 +341,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:DatasetsSerializer})
     @action(methods=['GET'], detail=False, url_path='get-list-dataset')
     def get_list_datasets(self, request):
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         usr = self.request.user
         usr = User.objects.get(email=usr.email)
 
@@ -322,6 +369,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         """
         set-parameters
         """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         id_model = request.query_params.get('id_model')
 
@@ -349,6 +398,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         """
         start train
         """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         
         # user = request.user
         # user = User.objects.get( id = user.pk)
@@ -383,6 +434,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         """
         stop train
         """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         
         user = request.user
         user = User.objects.get( id = user.pk)
@@ -405,6 +458,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         """
         get trainning results 
         """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         
         # user = request.user
         # user = User.objects.get( id = user.pk)
@@ -425,6 +480,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         """
         get trainning results 
         """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         
         # user = request.user
         # user = User.objects.get( id = user.pk)
