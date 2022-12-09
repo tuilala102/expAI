@@ -78,7 +78,7 @@ class UserSerializer(serializers.ModelSerializer):
             'usrdob', 
             'usrfaculty'
         )
-        read_only_fields = ('last_login', 'is_active', 'joined_at')
+        read_only_fields = ( 'is_staff','last_login', 'is_active', 'joined_at')
         extra_kwargs = {
             'password': {'required': True, 'write_only': True},
             'name': {'required': True}
@@ -116,7 +116,7 @@ class DatasetsSerializer(ModelSerializer):
     class Meta:
         model = Datasets
         fields = '__all__'
-        read_only_fields = ('datasetowner',)
+        read_only_fields = ('datasetowner',"datasetcreatedtime",)
 
 class ResultsSerializer(ModelSerializer):
     class Meta:
