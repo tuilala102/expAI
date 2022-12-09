@@ -19,7 +19,7 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             is_staff=is_staff,
-            
+
             is_active=True,
             is_superuser=is_superuser,
             last_login=now,
@@ -35,8 +35,8 @@ class UserManager(BaseUserManager):
 
     def create_user(self, email, password, **extra_fields):
         role = Roles.objects.get(rolename="STUDENT")
-        return self._create_user(email, password, is_superuser= False, roleid = role, **extra_fields)
-    
+        return self._create_user(email, password, is_superuser= False, is_staff=False, roleid = role, **extra_fields)
+
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, True, True, **extra_fields)
 
@@ -49,13 +49,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     joined_at = models.DateTimeField('Joined at', default=timezone.now)
     roleid = models.ForeignKey('roles', models.DO_NOTHING, db_column='roleid', blank=True, null=True)
     usrclass = models.ManyToManyField('class', db_column='usrclass', blank=True, null=True)
-    usrfullname = models.CharField(db_column='usrFullName', max_length=50, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    usrfullname = models.CharField(db_column='usrFullName', max_length=50  , blank=True, null=True)  # Field name made lowercase.
     usrdob = models.DateField(db_column='usrDoB', blank=True, null=True)  # Field name made lowercase.
     usrfaculty = models.CharField(db_column='usrFaculty', max_length=45, blank=True, null=True)  # Field name made lowercase.
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
- 
+
 
     # def __str__(self):
     #     return str(self.pk)
@@ -74,14 +74,11 @@ class Datasets(models.Model):
     datasetid = models.AutoField(db_column='datasetID', primary_key=True)  # Field name made lowercase.
     datasetname = models.CharField(db_column='datasetName', max_length=100, blank=True, null=True)  # Field name made lowercase.
     datasettype = models.ForeignKey("TypePermission", models.DO_NOTHING,db_column='datasetType', blank=True, null=True)  # Field name made lowercase.
-    expsoftwarelibid = models.ForeignKey('Softwarelibs', models.DO_NOTHING, db_column='expSoftwareLibID', blank=True, null=True)  # Field name made lowercase.
+    datasetsoftID = models.ForeignKey("SoftwareLibs", models.DO_NOTHING,db_column='datasetsoftID', blank=True, null=True)  # Field name made lowercase.
     datasetfolderurl = models.CharField(db_column='datasetFolderURL', max_length=200, blank=True, null=True)  # Field name made lowercase.
-    #datasettraining = models.IntegerField(db_column='datasetTraining', blank=True, null=True)  # Field name made lowercase.
-    #datasettesting = models.IntegerField(db_column='datasetTesting', blank=True, null=True)  # Field name made lowercase.
     datasetsum = models.IntegerField(db_column='datasetSum', blank=True, null=True)  # Field name made lowercase.
-    datasetcreator = models.CharField(db_column='datasetCreator', max_length=20, blank=True, null=True)  # Field name made lowercase.
-    datasetcreatedtime = models.DateTimeField(db_column='datasetCreatedTime', blank=True, null=True)  # Field name made lowercase.
-    datasetdescription = models.CharField(db_column='datasetDescription', max_length=200, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    datasetcreatedtime = models.DateTimeField(db_column='datasetCreatedTime', auto_now_add=True, blank=True)  # Field name made lowercase.
+    datasetdescription = models.CharField(db_column='datasetDescription', max_length=200  , blank=True, null=True)  # Field name made lowercase.
     datasetowner = models.ForeignKey("User", models.DO_NOTHING, db_column='datasetOwner', blank=True, null=True)
     class Meta:
         managed = True
@@ -101,9 +98,9 @@ class Evaluations(models.Model):
 
 
 class Experiments(models.Model):
+    expname = models.CharField(db_column='expName', max_length=100  , blank=True, null=True)  # Field name made lowercase.
     expid = models.AutoField(db_column='expID', primary_key=True)  # Field name made lowercase.
     expname = models.CharField(db_column='expName', max_length=100, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
-    #exptype = models.CharField(db_column='expType', max_length=10, blank=True, null=True)  # Field name made lowercase.
     expcreatorid = models.ForeignKey('User', models.DO_NOTHING, db_column='expCreatorID', blank=True, null=True)  # Field name made lowercase.
     expcreatedtime = models.DateTimeField(db_column='expCreatedTime', blank=True, null=True)  # Field name made lowercase.
     expmodelid = models.ForeignKey('Models', models.DO_NOTHING, db_column='expModelID', blank=True, null=True)  # Field name made lowercase.
@@ -226,9 +223,3 @@ class TypePermission(models.Model):
         managed = True
         db_table="TypePermission"
 
-# class Problem(models.Model):
-#     problemid = models.AutoField(primary_key=True)
-#     problemname = models.CharField(db_column="problemName", max_length=80, blank=True, null=True)
-#     class Meta:
-#         managed = True
-#         db_table = "Problem"

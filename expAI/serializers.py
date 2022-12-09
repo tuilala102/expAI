@@ -37,7 +37,7 @@ class ChangeNameSerializer(serializers.Serializer):
     """
     password = serializers.CharField(required=True)
     name = serializers.CharField(required=True)
-    usrclass = serializers.ListField(required=True)
+    # usrclass = serializers.ListField(required=True)
     usrfullname = serializers.CharField(required=True)
     usrdob = serializers.DateField(required=True)
     usrfaculty = serializers.CharField(required=True)
@@ -48,7 +48,7 @@ class DestroyUserSerializer(serializers.Serializer):
     Serializer for password change endpoint.
     """
     password = serializers.CharField(required=True)
-    
+
 class ChangePassword2Serializer(serializers.Serializer):
     model = User
 
@@ -73,9 +73,9 @@ class UserSerializer(serializers.ModelSerializer):
             'joined_at',
             'password',
             'is_staff',
-            'usrclass',
+
             'usrfullname',
-            'usrdob', 
+            'usrdob',
             'usrfaculty'
         )
         read_only_fields = ( 'is_staff','last_login', 'is_active', 'joined_at')
@@ -132,4 +132,3 @@ class ParamsconfigsSerializer(ModelSerializer):
     class Meta:
         models = Paramsconfigs
         fields = '__all__'
-        
