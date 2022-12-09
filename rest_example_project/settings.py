@@ -31,7 +31,7 @@ SESSION_COOKIE_SECURE = True
 
 
 
-ALLOWED_HOSTS = ['nhan9ckl.pythonanywhere.com', 'http://127.0.0.1:3000']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -114,7 +114,7 @@ DATABASES = {
 #         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
 #         'PORT': '3306',
 #     }
-}
+#}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
