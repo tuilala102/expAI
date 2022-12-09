@@ -256,6 +256,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     serializer_class = ExperimentsSerializer
     pagination_class = LargeResultsSetPagination
     permission_classes = [IsOwnerExp | IsAdmin]
+    authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def list(self, request, *args, **kwargs):
         '''
@@ -376,11 +377,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
         models = Models.objects.get(modelid = id_model)
         serializer = ModelsSerializer(models,many =False)
-        print(serializer)
 
         return Response(serializer.data)
-        #elif request.method == 'POST':
-        #in start train method 
 
 
 

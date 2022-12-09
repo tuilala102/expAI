@@ -149,8 +149,8 @@ class Objectembeddings(models.Model):
 
 class Objects(models.Model):
     objid = models.AutoField(db_column='objID', primary_key=True)  # Field name made lowercase.
-    objname = models.CharField(db_column='objName', max_length=50, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
-    objgeneralinfo = models.CharField(db_column='objGeneralInfo', max_length=500, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    objname = models.CharField(db_column='objName', max_length=50  , blank=True, null=True)  # Field name made lowercase.
+    objgeneralinfo = models.CharField(db_column='objGeneralInfo', max_length=500, blank=True, null=True)  # Field name made lowercase.
     objurlfolder = models.CharField(db_column='objURLFolder', max_length=200, blank=True, null=True)  # Field name made lowercase.
     objcreatedtime = models.DateTimeField(db_column='objCreatedTime', blank=True, null=True)  # Field name made lowercase.
     objcreator = models.CharField(db_column='objCreator', max_length=20, blank=True, null=True)  # Field name made lowercase.

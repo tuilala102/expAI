@@ -11,5 +11,8 @@ def check_json_file(json_string):
 
     return False
 
+def insert_into_result():
+    
+
 # x =  '{ "name":"John", "age":30,"city":"New York"}'
 # check_json_file(x)
