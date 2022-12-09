@@ -19,6 +19,10 @@ from .filters import *
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+from rest_framework.parsers import FileUploadParser, FormParser,MultiPartParser
+from .AI import *
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 class CsrfExemptSessionAuthentication(authentication.SessionAuthentication):
@@ -255,7 +259,7 @@ class UserView(generics.RetrieveAPIView):
     lookup_field = 'pk'
     authentication_classes = (CsrfExemptSessionAuthentication,)
     def get_object(self, *args, **kwargs):
-        return self.request.user
+        return self.request.user 
     # # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     # # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
     # #                       IsOwnerOrReadOnly]
@@ -304,22 +308,257 @@ class UserView(generics.RetrieveAPIView):
 
 
 class ExperimentsViewSet(viewsets.ModelViewSet):
+    model = Experiments
     queryset = Experiments.objects.all()
     serializer_class = ExperimentsSerializer
     authentication_classes = (CsrfExemptSessionAuthentication,)
-    param1 = openapi.Parameter(
-        'id_model', openapi.IN_QUERY, description='id cua model', type=openapi.TYPE_NUMBER)
+    pagination_class = LargeResultsSetPagination
+    permission_classes = [IsOwnerExp | IsAdmin]
+    authentication_classes = (CsrfExemptSessionAuthentication,)
 
-    @swagger_auto_schema(method='get', manual_parameters=[param1], responses={404: 'Not found', 200: 'ok', 201: ExperimentsSerializer})
-    @action(methods=['GET'], detail=False, url_path='get-models-name')
-    def get_model_name(self, request):
+    def list(self, request, *args, **kwargs):
+        '''
+        List all items
+        '''
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)        
+        usr = request.user
+        usr = User.objects.get( id = usr.pk)
+
+        if usr.roleid.rolename=="ADMIN":
+            queryset=Experiments.objects.all()
+        elif usr.roleid.rolename=="STUDENT":
+            queryset  = Experiments.objects.filter(expcreatorid = usr.id)
+        else:#giao vien
+            usrclass= list(usr.usrclass.all()) 
+            student = [list(i.user_set.all())  for i in usrclass]
+            student = sum(student,[])
+            queryset = Experiments.objects.filter(expcreatorid__in = student) | Experiments.objects.filter(expcreatorid = usr.id)
+
+        serializer = ExperimentsSerializer(queryset, many=True)
+        return Response(serializer.data)
+    def create(self, request, *args, **kwargs):
+
+            
+            if request.user.id == None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            serializer = ExperimentsSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+
+                return JsonResponse({
+                    'message': 'Create a new exp successful!'
+                }, status=status.HTTP_201_CREATED)
+
+            return JsonResponse({
+                'message': 'Create a new exp unsuccessful!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # @swagger_auto_schema(method='get',manual_parameters=[],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    # @action(methods=['GET'], detail=False, url_path='get-list-exps')
+    # def get_list_exps(self, request):
+    #     """
+    #     lay ds bai thi nghiem theo id user
+    #     """
+    #     if request.user.id == None:
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)        
+    #     usr = request.user
+    #     usr = User.objects.get( id = usr.pk)
+
+    #     if usr.roleid.rolename=="ADMIN":
+    #         queryset=Experiments.objects.all()
+    #     elif usr.roleid.rolename=="STUDENT":
+    #         queryset  = Experiments.objects.filter(expcreatorid = usr.id)
+    #     else:#giao vien
+    #         usrclass= list(usr.usrclass.all()) 
+    #         student = [list(i.user_set.all())  for i in usrclass]
+    #         student = sum(student,[])
+    #         queryset = Experiments.objects.filter(expcreatorid__in = student) | Experiments.objects.filter(expcreatorid = usr.id)
+
+    #     serializer = ExperimentsSerializer(queryset, many=True)
+    #     return Response(serializer.data)
+
+    id_softlib = openapi.Parameter('id_softlib',openapi.IN_QUERY,description='id cua softlib',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:ModelsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-list-models')
+    def get_list_models(self, request):
+
         """
-        get model name API
+        lay ds model theo id softlib
         """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        id_softlib = request.query_params.get('id_softlib')
+
+        models = Models.objects.filter(modelsoftlibid = id_softlib)
+        serializer = ModelsSerializer(models,many=True)
+
+        return Response(serializer.data)
+
+    #id_softlib = openapi.Parameter('id_softlib',openapi.IN_QUERY,description='id cua softlib',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[id_softlib],responses={404: 'Not found', 200:'ok', 201:DatasetsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-list-dataset')
+    def get_list_datasets(self, request):
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        usr = self.request.user
+        usr = User.objects.get(email=usr.email)
+
+        id_softlib = request.query_params.get('id_softlib')
+
+        if usr.roleid.rolename=="ADMIN":
+            queryset=Datasets.objects.all()
+        elif usr.roleid.rolename=="STUDENT":
+            queryset = Datasets.objects.filter(datasettype=1,expsoftwarelibid__pk = id_softlib)|Datasets.objects.filter(datasetowner = self.request.user,expsoftwarelibid__pk = id_softlib) 
+        else:#giao vien
+            usrclass= list(usr.usrclass.all()) 
+            student = [list(i.user_set.all())  for i in usrclass]
+            student = sum(student,[])
+            queryset = Datasets.objects.filter(datasettype=1,expsoftwarelibid__pk = id_softlib)|Datasets.objects.filter(datasetowner__in = student,expsoftwarelibid__pk = id_softlib) 
+
+        serializer = DatasetsSerializer(queryset,many=True)
+
+        return Response(serializer.data)
+    id_model = openapi.Parameter('id_model',openapi.IN_QUERY,description='id model',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[id_model],responses={404: 'Not found', 200:'ok', 201:ModelsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-default-parameters')
+    def get_default_parameters(self, request):
+
+        """
+        set-parameters
+        """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         id_model = request.query_params.get('id_model')
 
-        obj = Models.objects.get(modelid=id_model)
-        return Response({"result": obj.modelname})
+        models = Models.objects.get(modelid = id_model)
+        serializer = ModelsSerializer(models,many =False)
+
+        return Response(serializer.data)
+
+
+
+    
+
+    #start - stop train 
+    id_exp = openapi.Parameter('id_exp',openapi.IN_QUERY,description='id cua exp',type=openapi.TYPE_NUMBER)
+    paramsconfigs_json = openapi.Parameter('paramsconfigs_json',openapi.IN_QUERY,description='json string paramsconfig',type=openapi.TYPE_STRING)
+    id_paramsconfigs = openapi.Parameter('id_paramsconfigs',openapi.IN_QUERY,description='id cua bang paramsconfig',type=openapi.TYPE_NUMBER)
+
+    @swagger_auto_schema(manual_parameters=[id_exp, paramsconfigs_json],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['POST'], detail=False, url_path='start-train')
+    def start_train(self, request):
+
+        """
+        start train
+        """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        # user = request.user
+        # user = User.objects.get( id = user.pk)
+
+        id_exp = request.query_params.get('id_exp')
+        paramsconfigs_json = request.query_params.get('paramsconfigs_json')
+
+
+        if not check_json_file(paramsconfigs_json):
+
+            exp = Experiments.objects.get(expid = id_exp)
+            paramsconfigs = Paramsconfigs(jsonstringparams=paramsconfigs_json,trainningstatus=1,configexpid=exp)
+            paramsconfigs.save()
+            serializer = ParamsconfigsSerializer(paramsconfigs,many = False)
+
+
+            return Response(serializer, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({
+                'message': 'Có một số lỗi với chuỗi json được nhập!'
+            },status=status.HTTP_400_BAD_REQUEST)
+            #return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+    
+    
+    
+    @swagger_auto_schema(manual_parameters=[id_exp, id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
+    @action(methods=['POST'], detail=False, url_path='stop-train')
+    def stop_train(self, request):
+
+        """
+        stop train
+        """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        user = request.user
+        user = User.objects.get( id = user.pk)
+
+        id_exp = request.query_params.get('id_exp')
+        id_paramsconfigs = request.query_params.get('id_paramsconfigs')
+
+        exp = Experiments.objects.filter(expid = id_exp)
+        paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
+        paramsconfigs.trainningstatus = 0
+        paramsconfigs.save()
+        serializer = ParamsconfigsSerializer(paramsconfigs,many = False)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(method='get',manual_parameters=[id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ResultsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-list-traning-results')
+    def get_list_traning_results(self, request):
+
+        """
+        get trainning results 
+        """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        # user = request.user
+        # user = User.objects.get( id = user.pk)
+
+        # id_exp = request.query_params.get('id_exp')
+        id_paramsconfigs = request.query_params.get('id_paramsconfigs')
+
+        # exp = Experiments.objects.filter(expid = id_exp)
+        paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
+        queryset = Results.objects.filter(resultconfigid = paramsconfigs).order_by('resultid').values()
+        serializer = ResultsSerializer(queryset,many = True)
+        return Response(serializer.data)
+    pre_result_id = openapi.Parameter('pre_result_id',openapi.IN_QUERY,description='id của bản ghi trước đó, nếu gọi lần đầu thì để là 0',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(method='get',manual_parameters=[id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ResultsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-traning-result')
+    def get_traning_result(self, request):
+
+        """
+        get trainning results 
+        """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        # user = request.user
+        # user = User.objects.get( id = user.pk)
+
+        # id_exp = request.query_params.get('id_exp')
+        id_paramsconfigs = request.query_params.get('id_paramsconfigs')
+        pre_result_id = request.query_params.get('pre_result_id')
+
+        # exp = Experiments.objects.filter(expid = id_exp)
+        paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
+        queryset = Results.objects.filter(resultconfigid = paramsconfigs).order_by('resultid').values()
+
+        serializer = ResultsSerializer(queryset,many = True)
+        return Response(serializer.data)
+
+    
+import zipfile
+import uuid
+import os
+class DatasetsUploadView(views.APIView):
+    parser_classes = [FormParser,MultiPartParser]
 
 
 class DatasetsUploadView(views.APIView):

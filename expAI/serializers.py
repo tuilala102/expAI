@@ -103,19 +103,32 @@ class SoftwareLibsSerializer(ModelSerializer):
     # softwarelibdescription = models.CharField(db_column='softwarelibDescription', max_length=1000, blank=True, null=True)  # Field name made lowercase.
 
         model = Softwarelibs
-        fields = ["softwarelibid","softwarelibname","softwareliburl","softwarelibdescription"]
+        fields = '__all__'
 
 
 class ExperimentsSerializer(ModelSerializer):
     class Meta:
         model = Experiments
-        fields = ["expid","expname","exptype","expcreatorid","expcreatedtime",
-        "expmodelid","expdatasetid","expfilelog","expsoftwarelibid","expaftertrainmodelpath"]
+        fields = '__all__'
 
 
 class DatasetsSerializer(ModelSerializer):
     class Meta:
         model = Datasets
-        fields = ["datasetid","datasetname","datasettype","datasetfolderurl", "datasetsoftID"
-        ,"datasetsum","datasetcreatedtime","datasetdescription", 'datasetowner']
+        fields = '__all__'
         read_only_fields = ('datasetowner',"datasetcreatedtime",)
+
+class ResultsSerializer(ModelSerializer):
+    class Meta:
+        model = Results
+        fields = '__all__'
+
+class ModelsSerializer(ModelSerializer):
+    class Meta:
+        model = Models
+        fields = '__all__'
+
+class ParamsconfigsSerializer(ModelSerializer):
+    class Meta:
+        models = Paramsconfigs
+        fields = '__all__'

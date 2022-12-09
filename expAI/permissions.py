@@ -15,6 +15,18 @@ class IsOwnerOfObject(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj == request.user
 
+class IsOwnerExp(BasePermission):
+    """
+       Allows access only to owners
+    """
+
+    def has_object_permission(self, request, view, obj):
+       
+        if request.user == obj.expcreatorid:
+            return True
+
+        return False
+
 class IsAdmin(BasePermission):
 
     edit_methods = ("PUT", "PATCH")
