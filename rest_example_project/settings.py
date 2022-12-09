@@ -24,8 +24,14 @@ SECRET_KEY = 'django-insecure-^s3%fj236opglcd4o)d@t4y$8#^8(xd@srp2=aavgd#yivi7q9
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
 
-ALLOWED_HOSTS = ['*']
+
+
+ALLOWED_HOSTS = ['nhan9ckl.pythonanywhere.com', 'http://127.0.0.1:3000']
 
 
 # Application definition
@@ -46,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "django_samesite_none.middleware.SameSiteNoneMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -95,7 +102,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
 
-        'NAME': 'database.db'
+        'NAME': '../database.db'
     }
 }
 
@@ -156,12 +163,10 @@ if DEBUG:
     REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = (
             "rest_framework.renderers.JSONRenderer",
         )
-
-
-CORS_ORIGIN_ALLOW_ALL = True
+ # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = ['*']
-CORS_ORIGIN_WHITELIST = ('http://localhost:3000',)
-
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:3000',
+] # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
 
 AUTH_USER_MODEL = 'expAI.User'

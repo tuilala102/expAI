@@ -48,7 +48,7 @@ class DestroyUserSerializer(serializers.Serializer):
     Serializer for password change endpoint.
     """
     password = serializers.CharField(required=True)
-    
+
 class ChangePassword2Serializer(serializers.Serializer):
     model = User
 
@@ -73,9 +73,9 @@ class UserSerializer(serializers.ModelSerializer):
             'joined_at',
             'password',
             'is_staff',
-            
+
             'usrfullname',
-            'usrdob', 
+            'usrdob',
             'usrfaculty'
         )
         read_only_fields = ( 'is_staff','last_login', 'is_active', 'joined_at')
@@ -116,6 +116,6 @@ class ExperimentsSerializer(ModelSerializer):
 class DatasetsSerializer(ModelSerializer):
     class Meta:
         model = Datasets
-        fields = ["datasetid","datasetname","datasettype","datasetfolderurl","datasettraining",
-        "datasettesting","datasetsum","datasetcreator","datasetcreatedtime","datasetdescription", 'datasetowner']
-        read_only_fields = ('datasetowner',)
+        fields = ["datasetid","datasetname","datasettype","datasetfolderurl", "datasetsoftID"
+        ,"datasetsum","datasetcreatedtime","datasetdescription", 'datasetowner']
+        read_only_fields = ('datasetowner',"datasetcreatedtime",)

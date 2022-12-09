@@ -19,7 +19,7 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             is_staff=is_staff,
-            
+
             is_active=True,
             is_superuser=is_superuser,
             last_login=now,
@@ -36,7 +36,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         role = Roles.objects.get(rolename="STUDENT")
         return self._create_user(email, password, is_superuser= False, is_staff=False, roleid = role, **extra_fields)
-    
+
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, True, True, **extra_fields)
 
@@ -55,7 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
- 
+
 
     # def __str__(self):
     #     return str(self.pk)
@@ -76,11 +76,8 @@ class Datasets(models.Model):
     datasettype = models.ForeignKey("TypePermission", models.DO_NOTHING,db_column='datasetType', blank=True, null=True)  # Field name made lowercase.
     datasetsoftID = models.ForeignKey("SoftwareLibs", models.DO_NOTHING,db_column='datasetsoftID', blank=True, null=True)  # Field name made lowercase.
     datasetfolderurl = models.CharField(db_column='datasetFolderURL', max_length=200, blank=True, null=True)  # Field name made lowercase.
-    datasettraining = models.IntegerField(db_column='datasetTraining', blank=True, null=True)  # Field name made lowercase.
-    datasettesting = models.IntegerField(db_column='datasetTesting', blank=True, null=True)  # Field name made lowercase.
     datasetsum = models.IntegerField(db_column='datasetSum', blank=True, null=True)  # Field name made lowercase.
-    datasetcreator = models.CharField(db_column='datasetCreator', max_length=20, blank=True, null=True)  # Field name made lowercase.
-    datasetcreatedtime = models.DateTimeField(db_column='datasetCreatedTime', blank=True, null=True)  # Field name made lowercase.
+    datasetcreatedtime = models.DateTimeField(db_column='datasetCreatedTime', auto_now_add=True, blank=True)  # Field name made lowercase.
     datasetdescription = models.CharField(db_column='datasetDescription', max_length=200  , blank=True, null=True)  # Field name made lowercase.
     datasetowner = models.ForeignKey("User", models.DO_NOTHING, db_column='datasetOwner', blank=True, null=True)
     class Meta:

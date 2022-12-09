@@ -21,6 +21,9 @@ from django.utils.decorators import method_decorator
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 # Create your views here.
 
+class CsrfExemptSessionAuthentication(authentication.SessionAuthentication):
+    def enforce_csrf(self, request):
+        return
 
 class expAIViewSet(viewsets.ModelViewSet):
     """
@@ -45,7 +48,7 @@ class DatasetsViewSet(viewsets.ModelViewSet):
 
     Additionally we also provide an extra `checkBody` action.
     """
-
+    authentication_classes = (CsrfExemptSessionAuthentication,)
     serializer_class = DatasetsSerializer
     permission_classes = [IsOwner | IsAdmin]
     pagination_class = LargeResultsSetPagination
@@ -110,7 +113,7 @@ class AccountsViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['email', 'name']
-
+    authentication_classes = (CsrfExemptSessionAuthentication,)
 
 class ChangeUserPasswordView(generics.UpdateAPIView):
     queryset = User.objects.all()
@@ -132,9 +135,6 @@ class ChangeUserPasswordView(generics.UpdateAPIView):
         return Response({"result": "Success"})
 
 
-class CsrfExemptSessionAuthentication(authentication.SessionAuthentication):
-    def enforce_csrf(self, request):
-        return
 
 
 class LoginView(generics.CreateAPIView):
@@ -152,6 +152,7 @@ class LoginView(generics.CreateAPIView):
 
 
 class LogoutView(views.APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
     @swagger_auto_schema(tags=['Đăng nhập - Đăng ký'])
     def post(self, request):
         logout(request)
@@ -172,6 +173,7 @@ class RegisterView(generics.CreateAPIView):
 
 
 class ChangePasswordView(generics.UpdateAPIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
     """
     An endpoint for changing password.
     """
@@ -214,7 +216,7 @@ class ChangeNameView(generics.UpdateAPIView):
     serializer_class = ChangeNameSerializer
     model = User
     permission_classes = (IsAuthenticated,)
-
+    authentication_classes = (CsrfExemptSessionAuthentication,)
     def get_object(self, queryset=None):
         obj = self.request.user
         obj = User.objects.get(id=obj.pk)
@@ -251,7 +253,7 @@ class ChangeNameView(generics.UpdateAPIView):
 class UserView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     lookup_field = 'pk'
-
+    authentication_classes = (CsrfExemptSessionAuthentication,)
     def get_object(self, *args, **kwargs):
         return self.request.user
     # # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -304,7 +306,7 @@ class UserView(generics.RetrieveAPIView):
 class ExperimentsViewSet(viewsets.ModelViewSet):
     queryset = Experiments.objects.all()
     serializer_class = ExperimentsSerializer
-
+    authentication_classes = (CsrfExemptSessionAuthentication,)
     param1 = openapi.Parameter(
         'id_model', openapi.IN_QUERY, description='id cua model', type=openapi.TYPE_NUMBER)
 
@@ -322,8 +324,18 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
 class DatasetsUploadView(views.APIView):
     parser_classes = [FormParser, MultiPartParser]
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    # @swagger_auto_schema(tags=['datasets'])
+    @swagger_auto_schema(
+            operation_id='Upload zip',
+            operation_description='Upload zip',
+            operation_summary="Upload file zip cho bạn Hiếu",
+            manual_parameters=[
+                openapi.Parameter('file', openapi.IN_FORM, type=openapi.TYPE_FILE, description='Zip to be uploaded'),
 
-    @swagger_auto_schema(tags=['datasets'])
+            ],
+tags=['datasets']
+        )
     def post(self, request):
         file_obj = request.data['file']
         new_name = uuid.uuid4()
