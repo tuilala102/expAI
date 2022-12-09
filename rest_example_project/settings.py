@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework', ## add here
     'expAI.apps.expAIConfig', # register your apps
     'drf_yasg', # swagger
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -79,9 +80,9 @@ WSGI_APPLICATION = 'rest_example_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'expai',
+        'NAME': 'expai2',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': '01102000',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
@@ -132,7 +133,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # pagination
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 # how to disable the Browsable API in production
@@ -144,3 +146,6 @@ if DEBUG:
     REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = (
             "rest_framework.renderers.JSONRenderer",
         )
+
+
+AUTH_USER_MODEL = 'expAI.User'
