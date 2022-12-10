@@ -410,12 +410,12 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         if usr.roleid.rolename=="ADMIN":
             queryset=Datasets.objects.all()
         elif usr.roleid.rolename=="STUDENT":
-            queryset = Datasets.objects.filter(datasettype=1,expsoftwarelibid__pk = id_softlib)|Datasets.objects.filter(datasetowner = self.request.user,expsoftwarelibid__pk = id_softlib) 
+            queryset = Datasets.objects.filter(datasettype=1,datasetsoftID__pk = id_softlib)|Datasets.objects.filter(datasetowner = self.request.user,datasetsoftID__pk = id_softlib) 
         else:#giao vien
             usrclass= list(usr.usrclass.all()) 
             student = [list(i.user_set.all())  for i in usrclass]
             student = sum(student,[])
-            queryset = Datasets.objects.filter(datasettype=1,expsoftwarelibid__pk = id_softlib)|Datasets.objects.filter(datasetowner__in = student,expsoftwarelibid__pk = id_softlib) 
+            queryset = Datasets.objects.filter(datasettype=1,datasetsoftID__pk = id_softlib)|Datasets.objects.filter(datasetowner__in = student,datasetsoftID__pk = id_softlib) 
 
         serializer = DatasetsSerializer(queryset,many=True)
 
