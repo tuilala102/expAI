@@ -31,7 +31,7 @@ SESSION_COOKIE_SECURE = True
 
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
