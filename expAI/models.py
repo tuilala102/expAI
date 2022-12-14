@@ -100,7 +100,7 @@ class Evaluations(models.Model):
 class Experiments(models.Model):
     expname = models.CharField(db_column='expName', max_length=100  , blank=True, null=True)  # Field name made lowercase.
     expid = models.AutoField(db_column='expID', primary_key=True)  # Field name made lowercase.
-    expname = models.CharField(db_column='expName', max_length=100, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    expname = models.CharField(db_column='expName', max_length=100 , blank=True, null=True)  # Field name made lowercase.
     expcreatorid = models.ForeignKey('User', models.DO_NOTHING, db_column='expCreatorID', blank=True, null=True)  # Field name made lowercase.
     expcreatedtime = models.DateTimeField(db_column='expCreatedTime', blank=True, null=True)  # Field name made lowercase.
     expmodelid = models.ForeignKey('Models', models.DO_NOTHING, db_column='expModelID', blank=True, null=True)  # Field name made lowercase.

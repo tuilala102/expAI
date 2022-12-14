@@ -101,13 +101,13 @@ WSGI_APPLICATION = 'rest_example_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '../database.db'
+        'NAME': './database.db'
     }
 }
 
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql', 
+#         'ENGINE': 'django.db.backends.mysql',
 #         'NAME': 'expai2',
 #         'USER': 'root',
 #         'PASSWORD': '01102000',
