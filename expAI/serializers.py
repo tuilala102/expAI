@@ -130,5 +130,5 @@ class ModelsSerializer(ModelSerializer):
 
 class ParamsconfigsSerializer(ModelSerializer):
     class Meta:
-        models = Paramsconfigs
+        model = Paramsconfigs
         fields = '__all__'

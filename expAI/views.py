@@ -447,8 +447,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     paramsconfigs_json = openapi.Parameter('paramsconfigs_json',openapi.IN_QUERY,description='json string paramsconfig',type=openapi.TYPE_STRING)
     id_paramsconfigs = openapi.Parameter('id_paramsconfigs',openapi.IN_QUERY,description='id cua bang paramsconfig',type=openapi.TYPE_NUMBER)
 
-    @swagger_auto_schema(manual_parameters=[id_exp, paramsconfigs_json],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
-    @action(methods=['POST'], detail=False, url_path='start-train')
+    @swagger_auto_schema(manual_parameters=[id_exp, paramsconfigs_json],responses={404: 'Not found', 200:'ok'})
+    @action(methods=['GET'], detail=False, url_path='start-train')
     def start_train(self, request):
 
         """
@@ -462,9 +462,10 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
         id_exp = request.query_params.get('id_exp')
         paramsconfigs_json = request.query_params.get('paramsconfigs_json')
+        print(paramsconfigs_json)
 
 
-        if not check_json_file(paramsconfigs_json):
+        if check_json_file(paramsconfigs_json):
 
             exp = Experiments.objects.get(expid = id_exp)
             paramsconfigs = Paramsconfigs(jsonstringparams=paramsconfigs_json,trainningstatus=1,configexpid=exp)
@@ -472,7 +473,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
             serializer = ParamsconfigsSerializer(paramsconfigs,many = False)
 
 
-            return Response(serializer, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse({
                 'message': 'Có một số lỗi với chuỗi json được nhập!'
@@ -483,8 +484,8 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     
     
     
-    @swagger_auto_schema(manual_parameters=[id_exp, id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
-    @action(methods=['POST'], detail=False, url_path='stop-train')
+    @swagger_auto_schema(manual_parameters=[id_paramsconfigs],responses={404: 'Not found', 200:'ok'})
+    @action(methods=['GET'], detail=False, url_path='stop-train')
     def stop_train(self, request):
 
         """

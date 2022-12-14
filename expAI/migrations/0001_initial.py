@@ -258,6 +258,12 @@ class Migration(migrations.Migration):
         migrations.RunSQL("insert into `softwarelibs` (`softwarelibName`, `softwarelibURL`) values ('Thu vien Nhan dien khuon mat','FACE_REG');"),
         migrations.RunSQL("insert into `softwarelibs` (`softwarelibName`, `softwarelibURL`) values ('Thu vien Nhan dien hanh vi bat thuong','ACTION_ABNORM_REG');"),
         migrations.RunSQL("insert into `softwarelibs` (`softwarelibName`, `softwarelibURL`) values ('Thu vien Phat hien khuon mat','FACE_DECTECT');"),
+
         migrations.RunSQL("insert into `class` (`classID`, `classCode`, `className`, `classSchoolYear`) values ('1','KHMT001','Khoa hoc may tinh k57', '2020-2021');"),
+
+        # migrations.RunSQL("INSERT INTO datasets (datasetID,datasetName,datasetFolderURL,datasetOwner,datasetType,datasetSum,datasetsoftID,datasetCreatedTime) VALUES (1,'COCO dataset','/',1,1,1000,3,CURRENT_TIMESTAMP);"),
+        # migrations.RunSQL("INSERT INTO datasets (datasetID,datasetName,datasetFolderURL,datasetOwner,datasetType,datasetSum,datasetsoftID,datasetCreatedTime) VALUES (2,'VN Face','/',1,1,1000,1,CURRENT_TIMESTAMP);"),
+        # migrations.RunSQL("INSERT INTO `models` (`modelID`,`modelName`,`modelSoftLibID`,`modelCreator`,`modelDescription`,`modelFIleTutorial`,`modelFileDescription`,`pretrainpath`,`jsonStringParams`,`datasetType`) VALUES ('1','YoloFace','3','1','/','/','/','/', '{ \"weights\":\"yoloface.pt\", \"epochs\":30, \"batch-size\":16,\"img-size\": [640, 640]}','1');"),
+        # migrations.RunSQL("INSERT INTO models (modelID,modelName,modelSoftLibID,modelCreator,modelDescription,modelFIleTutorial,modelFileDescription,pretrainpath,jsonStringParams,datasetType) VALUES(2,'FaceNet',1,1,'/','/','/','/', '{ \"weights\":\"yoloface.pt\", \"epochs\":30, \"batch-size\":16,\"img-size\": [640, 640]}',1);"),
 
     ]
