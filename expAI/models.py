@@ -175,6 +175,12 @@ class Paramsconfigs(models.Model):
         managed = True
         db_table = 'paramsconfigs'
 
+class Trainningresults(models.Model):
+    trainresultid =  models.AutoField(db_column='trainResultID', primary_key=True)
+    trainresultindex = models.IntegerField(db_column='trainResultIndex',default=0)
+    lossvalue = models.FloatField(db_column='lossvalue')
+    accuracy = models.FloatField(db_column='accuracy')
+    configid = models.ForeignKey(Paramsconfigs, models.DO_NOTHING, db_column='configID', blank=True, null=True)  # Field name made lowercase.
 
 class Results(models.Model):
     resultid = models.AutoField(db_column='resultID', primary_key=True)  # Field name made lowercase.

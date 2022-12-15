@@ -526,11 +526,15 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
         # exp = Experiments.objects.filter(expid = id_exp)
         paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
-        queryset = Results.objects.filter(resultconfigid = paramsconfigs).order_by('resultid').values()
-        serializer = ResultsSerializer(queryset,many = True)
+        queryset = Trainningresults.objects.filter(configid = paramsconfigs).order_by('trainresultid')
+        
+        serializer = TrainningresultsSerializer(queryset,many = True)
         return Response(serializer.data)
+
+
+
     pre_result_id = openapi.Parameter('pre_result_id',openapi.IN_QUERY,description='id của bản ghi trước đó, nếu gọi lần đầu thì để là 0',type=openapi.TYPE_NUMBER)
-    @swagger_auto_schema(method='get',manual_parameters=[id_paramsconfigs],responses={404: 'Not found', 200:'ok', 201:ResultsSerializer})
+    @swagger_auto_schema(method='get',manual_parameters=[id_paramsconfigs,pre_result_id],responses={404: 'Not found', 200:'ok', 201:ResultsSerializer})
     @action(methods=['GET'], detail=False, url_path='get-traning-result')
     def get_traning_result(self, request):
 
@@ -549,10 +553,21 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
         # exp = Experiments.objects.filter(expid = id_exp)
         paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
-        queryset = Results.objects.filter(resultconfigid = paramsconfigs).order_by('resultid').values()
+        _results = Trainningresults.objects.filter(configid = paramsconfigs).order_by('trainresultid')
+        for position, _result in enumerate(_results):
+            if _result.trainresultid == int(pre_result_id)+1:
+                try:
+                    queryset = _result
+                    serializer = TrainningresultsSerializer(queryset,many = False)
+                    return Response(serializer.data,status=status.HTTP_200_OK)
+                except:
+                    return JsonResponse({
+                                'message': 'Chưa có result mới!'
+                            },status=status.HTTP_102_PROCESSING)
 
-        serializer = ResultsSerializer(queryset,many = True)
-        return Response(serializer.data)
+        return JsonResponse({
+                'message': 'Chưa có result mới!'
+            },status=status.HTTP_400_BAD_REQUEST)
 
     
 import zipfile
@@ -560,10 +575,6 @@ import uuid
 import os
 class DatasetsUploadView(views.APIView):
     parser_classes = [FormParser,MultiPartParser]
-
-
-class DatasetsUploadView(views.APIView):
-    parser_classes = [FormParser, MultiPartParser]
     authentication_classes = (CsrfExemptSessionAuthentication,)
     # @swagger_auto_schema(tags=['datasets'])
     @swagger_auto_schema(

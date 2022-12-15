@@ -132,3 +132,9 @@ class ParamsconfigsSerializer(ModelSerializer):
     class Meta:
         model = Paramsconfigs
         fields = '__all__'
+
+
+class TrainningresultsSerializer(ModelSerializer):
+    class Meta:
+        model = Trainningresults
+        fields = '__all__'
