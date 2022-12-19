@@ -184,7 +184,7 @@ class Trainningresults(models.Model):
 
 class Results(models.Model):
     resultid = models.AutoField(db_column='resultID', primary_key=True)  # Field name made lowercase.
-    resulttestingdataset = models.CharField(db_column='resultTestingDataset', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    resulttestingdataset = models.ForeignKey(Datasets,models.DO_NOTHING, db_column='resultTestingDataset', blank=True, null=True)  # Field name made lowercase.
     resultaccuracy = models.FloatField(db_column='resultAccuracy', blank=True, null=True)  # Field name made lowercase.
     resultdetail = models.CharField(db_column='resultDetail', max_length=800, blank=True, null=True)  # Field name made lowercase.
     resultconfigid = models.ForeignKey(Paramsconfigs, models.DO_NOTHING, db_column='resultConfigID', blank=True, null=True)  # Field name made lowercase.

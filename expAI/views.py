@@ -597,6 +597,53 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
             },status=status.HTTP_400_BAD_REQUEST)
 
 
+    id_dataset = openapi.Parameter('id_dataset',openapi.IN_QUERY,description='id cua dataset test',type=openapi.TYPE_NUMBER)
+    id_paramsconfigs = openapi.Parameter('id_paramsconfigs',openapi.IN_QUERY,description='id cua bang paramsconfig',type=openapi.TYPE_NUMBER)
+
+    @swagger_auto_schema(manual_parameters=[id_dataset, id_paramsconfigs],responses={404: 'Not found', 200:'ok',201:ResultsSerializer})
+    @action(methods=['GET'], detail=False, url_path='start-test')
+    def start_test(self, request):
+
+        """
+        start_test
+        """
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+        id_dataset = request.query_params.get('id_dataset')
+        id_paramsconfigs = request.query_params.get('id_paramsconfigs')
+        _dataset = Datasets.objects.get(pk = id_dataset)
+        _paramsconfigs = Paramsconfigs.objects.get(pk = id_paramsconfigs)
+        _result = Results()
+        _result.resultconfigid = _paramsconfigs
+        _result.resulttestingdataset = _dataset
+        _result.save()
+        serializer = ResultsSerializer(_result,many = False)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+    id_test_result = openapi.Parameter('id_test_result',openapi.IN_QUERY,description='id test result nhan khi gọi API start test',type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(manual_parameters=[id_test_result,],responses={404: 'Not found', 200:'ok',201:ResultsSerializer})
+    @action(methods=['GET'], detail=False, url_path='get-test-result')
+    def get_test_result(self, request):
+        if request.user.id == None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        id_test_result = request.query_params.get('id_test_result')
+        _result = Results.objects.get(pk = id_test_result)
+        if _result.resultaccuracy:
+            serializer = ResultsSerializer(_result,many = False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            serializer = ResultsSerializer(_result,many = False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        
+
+    
+
+
 import zipfile
 import uuid
 import os

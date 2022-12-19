@@ -123,7 +123,7 @@ class ResultsSerializer(ModelSerializer):
     class Meta:
         model = Results
         fields = '__all__'
-
+        read_only_fields = ('resultaccuracy','resultdetail',)
 class ModelsSerializer(ModelSerializer):
     class Meta:
         model = Models
