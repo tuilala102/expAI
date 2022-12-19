@@ -29,7 +29,7 @@ class CsrfExemptSessionAuthentication(authentication.SessionAuthentication):
     def enforce_csrf(self, request):
         return
 
-class SoftwarelibsViewSet(viewsets.ModelViewSet):
+class expAIViewSet(viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
