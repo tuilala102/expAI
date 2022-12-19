@@ -84,9 +84,9 @@ class UserSerializer(serializers.ModelSerializer):
             'name': {'required': True}
         }
 
-    @staticmethod
-    def validate_email(value):
-        return validate_username(value)
+    # @staticmethod
+    # def validate_email(value):
+    #     return validate_username(value)
 
     def create(self, validated_data):
         return User.objects.create_user(

@@ -118,7 +118,26 @@ class AccountsViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['email', 'name']
     authentication_classes = (CsrfExemptSessionAuthentication,)
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()
+    def update(self, request, *args, **kwargs):
+        from django.contrib.auth.hashers import (
+    make_password,
+)
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        request.data["password"]=make_password(request.data["password"])
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
 
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 class ChangeUserPasswordView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = ChangePassword2Serializer
@@ -259,7 +278,7 @@ class UserView(generics.RetrieveAPIView):
     lookup_field = 'pk'
     authentication_classes = (CsrfExemptSessionAuthentication,)
     def get_object(self, *args, **kwargs):
-        return self.request.user 
+        return self.request.user
     # # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     # # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
     # #                       IsOwnerOrReadOnly]
@@ -321,7 +340,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         List all items
         '''
         if request.user.id == None:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)        
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         usr = request.user
         usr = User.objects.get( id = usr.pk)
 
@@ -330,7 +349,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         elif usr.roleid.rolename=="STUDENT":
             queryset  = Experiments.objects.filter(expcreatorid = usr.id)
         else:#giao vien
-            usrclass= list(usr.usrclass.all()) 
+            usrclass= list(usr.usrclass.all())
             student = [list(i.user_set.all())  for i in usrclass]
             student = sum(student,[])
             queryset = Experiments.objects.filter(expcreatorid__in = student) | Experiments.objects.filter(expcreatorid = usr.id)
@@ -339,7 +358,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     def create(self, request, *args, **kwargs):
 
-            
+
             if request.user.id == None:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
             serializer = ExperimentsSerializer(data=request.data)
@@ -353,7 +372,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
             return JsonResponse({
                 'message': 'Create a new exp unsuccessful!'
             }, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # @swagger_auto_schema(method='get',manual_parameters=[],responses={404: 'Not found', 200:'ok', 201:ExperimentsSerializer})
     # @action(methods=['GET'], detail=False, url_path='get-list-exps')
     # def get_list_exps(self, request):
@@ -361,7 +380,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     #     lay ds bai thi nghiem theo id user
     #     """
     #     if request.user.id == None:
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)        
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
     #     usr = request.user
     #     usr = User.objects.get( id = usr.pk)
 
@@ -370,7 +389,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     #     elif usr.roleid.rolename=="STUDENT":
     #         queryset  = Experiments.objects.filter(expcreatorid = usr.id)
     #     else:#giao vien
-    #         usrclass= list(usr.usrclass.all()) 
+    #         usrclass= list(usr.usrclass.all())
     #         student = [list(i.user_set.all())  for i in usrclass]
     #         student = sum(student,[])
     #         queryset = Experiments.objects.filter(expcreatorid__in = student) | Experiments.objects.filter(expcreatorid = usr.id)
@@ -410,12 +429,12 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         if usr.roleid.rolename=="ADMIN":
             queryset=Datasets.objects.all()
         elif usr.roleid.rolename=="STUDENT":
-            queryset = Datasets.objects.filter(datasettype=1,datasetsoftID__pk = id_softlib)|Datasets.objects.filter(datasetowner = self.request.user,datasetsoftID__pk = id_softlib) 
+            queryset = Datasets.objects.filter(datasettype=1,datasetsoftID__pk = id_softlib)|Datasets.objects.filter(datasetowner = self.request.user,datasetsoftID__pk = id_softlib)
         else:#giao vien
-            usrclass= list(usr.usrclass.all()) 
+            usrclass= list(usr.usrclass.all())
             student = [list(i.user_set.all())  for i in usrclass]
             student = sum(student,[])
-            queryset = Datasets.objects.filter(datasettype=1,datasetsoftID__pk = id_softlib)|Datasets.objects.filter(datasetowner__in = student,datasetsoftID__pk = id_softlib) 
+            queryset = Datasets.objects.filter(datasettype=1,datasetsoftID__pk = id_softlib)|Datasets.objects.filter(datasetowner__in = student,datasetsoftID__pk = id_softlib)
 
         serializer = DatasetsSerializer(queryset,many=True)
 
@@ -440,9 +459,9 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
 
 
 
-    
 
-    #start - stop train 
+
+    #start - stop train
     id_exp = openapi.Parameter('id_exp',openapi.IN_QUERY,description='id cua exp',type=openapi.TYPE_NUMBER)
     paramsconfigs_json = openapi.Parameter('paramsconfigs_json',openapi.IN_QUERY,description='json string paramsconfig',type=openapi.TYPE_STRING)
     id_paramsconfigs = openapi.Parameter('id_paramsconfigs',openapi.IN_QUERY,description='id cua bang paramsconfig',type=openapi.TYPE_NUMBER)
@@ -456,7 +475,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         """
         if request.user.id == None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        
+
         # user = request.user
         # user = User.objects.get( id = user.pk)
 
@@ -481,9 +500,9 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
             #return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-    
-    
-    
+
+
+
     @swagger_auto_schema(manual_parameters=[id_paramsconfigs],responses={404: 'Not found', 200:'ok'})
     @action(methods=['GET'], detail=False, url_path='stop-train')
     def stop_train(self, request):
@@ -493,7 +512,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         """
         if request.user.id == None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        
+
         user = request.user
         user = User.objects.get( id = user.pk)
 
@@ -513,11 +532,11 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     def get_list_traning_results(self, request):
 
         """
-        get trainning results 
+        get trainning results
         """
         if request.user.id == None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        
+
         # user = request.user
         # user = User.objects.get( id = user.pk)
 
@@ -527,7 +546,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
         # exp = Experiments.objects.filter(expid = id_exp)
         paramsconfigs = Paramsconfigs.objects.get(configid = id_paramsconfigs)
         queryset = Trainningresults.objects.filter(configid = paramsconfigs).order_by('trainresultid')
-        
+
         serializer = TrainningresultsSerializer(queryset,many = True)
         return Response(serializer.data)
 
@@ -539,11 +558,11 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
     def get_traning_result(self, request):
 
         """
-        get trainning results 
+        get trainning results
         """
         if request.user.id == None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        
+
         # user = request.user
         # user = User.objects.get( id = user.pk)
 
@@ -569,7 +588,7 @@ class ExperimentsViewSet(viewsets.ModelViewSet):
                 'message': 'Chưa có result mới!'
             },status=status.HTTP_400_BAD_REQUEST)
 
-    
+
 import zipfile
 import uuid
 import os
